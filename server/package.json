@@ -1,0 +1,23 @@
+{
+  "name": "seng-513-project",
+  "version": "1.0.0",
+  "description": "SENG 513 project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasLongarini/SENG-513-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LucasLongarini/SENG-513-project/issues"
+  },
+  "homepage": "https://github.com/LucasLongarini/SENG-513-project#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.6"
+  }
+}
