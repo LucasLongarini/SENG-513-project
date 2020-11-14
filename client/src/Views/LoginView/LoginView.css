@@ -1,0 +1,14 @@
+
+.login-view {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background-color: red;
+    position: absolute;
+    height: 80vh;
+}
