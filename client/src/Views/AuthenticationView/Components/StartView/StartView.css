@@ -1,0 +1,21 @@
+.register-text {
+    margin-top: 20px;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: medium;
+    font-weight: 500;
+    text-align: end;
+}
+
+.register-button {
+    border: 0;
+    background: transparent;
+    color: #CE5BF7;
+    font-weight: 600;
+    font-size: medium;
+    outline:none;
+    border-radius: 5px;
+}
+
+.register-button:active {
+    color: #c4548a;
+}

@@ -1,0 +1,50 @@
+
+.authentication-view {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.authentication-container {
+    background-color: white;
+    position: absolute;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 5px 5px 20px 0px rgba(0, 0, 0, 0.25);
+}
+
+.authentication-logo {
+    width: 55%;
+}
+
+.login-button{
+    width: 100%;
+    border: 0;
+    padding: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+    outline:none;
+    margin: 20px 0 10px 0;
+    border-radius: 5px;
+    box-shadow: 5px 5px 20px 0px rgba(0, 0, 0, 0.25);
+}
+
+.login-color {
+    background-color: #CE5BF7;
+}
+
+.login-color:active {
+    background-color: #c4548a;
+}
+
+.guest-color {
+    background-color: #F7735B;
+}
+
+.guest-color:active {
+    background-color: #c55c4a;
+}

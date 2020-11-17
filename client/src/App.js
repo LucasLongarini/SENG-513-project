@@ -1,10 +1,9 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import LoginView from './Views/LoginView/LoginView';
+import AuthenticationView from './Views/AuthenticationView/AuthenticationView';
 
 function App() {
   return (
-    <LoginView></LoginView>
+    <AuthenticationView></AuthenticationView>
   );
 }
 
