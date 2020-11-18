@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import TextField from '@material-ui/core/TextField';
@@ -7,7 +8,11 @@ import Grid from '@material-ui/core/Grid';
 import Views from '../../State/Views';
 
 
+
 function LoginView(props) {
+
+  const router = useHistory();
+
   return (
     <div>
       <Grid container spacing={3}>
@@ -19,15 +24,15 @@ function LoginView(props) {
         </Grid>
         
         <Grid item xs={12}>
-          <TextField id="username" label="Username" variant="outlined" fullWidth/>
+          <TextField id="email" label="Email" variant="outlined" fullWidth type="email"/>
         </Grid>
 
         <Grid item xs={12}>
-          <TextField id="password" label="Password" variant="outlined" fullWidth/>
+          <TextField id="password" label="Password" variant="outlined" fullWidth type="password"/>
         </Grid>
         
         <Grid item xs={12}>
-          <button className='login-button login-color'>Login</button>
+          <button onClick={() => router.push("/home")} className='login-button login-color'>Login</button>
         </Grid>
       </Grid>
     </div>

@@ -1,0 +1,9 @@
+.displayiconpicker-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.displayiconpicker-emoji {
+    width: 50%;
+}

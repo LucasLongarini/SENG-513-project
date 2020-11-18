@@ -4,6 +4,7 @@ import './AuthenticationView.css';
 import Background from '../../assets/images/Authpage_background.jpg';
 import LoginView from './Components/LoginView/LoginView';
 import StartView from './Components/StartView/StartView';
+import RegisterView from './Components/RegisterView/RegisterView';
 import Views from './State/Views';
 
 function AuthenticationView() {
@@ -20,8 +21,10 @@ function AuthenticationView() {
       renderedView = (<LoginView setView={setView}/>)
       break;
     case Views.Register:
-      //TODO change
-      renderedView = (<StartView />);
+      renderedView = (<RegisterView isGuest={false} setView={setView}/>);
+      break;
+    case Views.Guest:
+      renderedView = (<RegisterView isGuest={true} setView={setView}/>);
       break;
   }
 

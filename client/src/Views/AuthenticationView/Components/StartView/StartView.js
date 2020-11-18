@@ -24,12 +24,12 @@ function StartView(props) {
         </Grid>
 
         <Grid item xs={12}>
-          <button className='login-button guest-color'>Play As Guest</button>
+          <button onClick={() => props.setView(Views.Guest)} className='login-button guest-color'>Play As Guest</button>
         </Grid>
 
         <Grid item xs={12}>
             <h6 className="register-text">Dont have an account? <span>
-                    <button className="register-button">Register</button>
+                    <button onClick={() => props.setView(Views.Register)} className="register-button">Register</button>
                 </span>
             </h6>
         </Grid>
