@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 
+//TODO check if display name is taken??
 router.post('/register', async (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
@@ -11,7 +12,7 @@ router.post('/register', async (req, res) => {
     var emojiId = req.body.emojiId;
     var isGuest = req.body.isGuest;
 
-    if (!name || !emojiId || isGuest === undefined) 
+    if (!name || name.length == 0 || emojiId === undefined || isGuest === undefined) 
         return res.status(400).json({Error: "Bad request"});
     
     try {
@@ -65,13 +66,14 @@ router.post('/register', async (req, res) => {
             token: token
         });
     }
-    catch {
+    catch (err) {
+        console.log(err);
         return res.status(500).json({Error:"Server error"});
     }        
 
 });
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     let email = req.body.email;
     let password = req.body.password;
 
@@ -112,7 +114,8 @@ router.get('/login', async (req, res) => {
             token: token
         });
     }
-    catch {
+    catch (error) {
+        console.log(error);
         return res.status(500).json({Error: "Server error"});
     }
 });

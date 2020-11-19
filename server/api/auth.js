@@ -2,12 +2,12 @@ const { request } = require('express');
 const jwt = require ('jsonwebtoken');
 
 module.exports = (req, res, next) =>{
-    if (req.path == '/user/register' || req.path == '/user/login')
+    if (req.path == '/' || req.path == '/user/register' || req.path == '/user/login')
         return next();
     
-    var token = req.headers.authorization;
+    var token = req.headers.token;
     if (!token) {
-        return res.status(400).json({Error: "Authorization token not found"});
+        return res.status(400).json({Error: "Authentication token not found"});
     }
 
     try{

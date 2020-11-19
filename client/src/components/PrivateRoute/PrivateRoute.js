@@ -5,10 +5,11 @@ import AuthenticationService from '../../services/AuthenticationService';
 function PrivateRoute ({ component: Component, ...rest }) {
     return (
         <Route {...rest} render={(props) => (
-            AuthenticationService.isAuthenticated ? 
+            //TODO have this token verified on the server
+            localStorage.getItem('token') ? 
                 <Component {...props} />
             : 
-                <Redirect to={{pathname: "/", state: { from: props.location}}} />
+                <Redirect to={{pathname: "/login", state: { from: props.location}}} />
             )} 
         />
     );

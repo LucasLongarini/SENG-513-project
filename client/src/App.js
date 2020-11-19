@@ -7,13 +7,16 @@ import {
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AuthenticationView from './Views/AuthenticationView/AuthenticationView';
 import HomeView from './Views/HomeView/HomeView';
+import axios from 'axios';
+import packageJson from '../package.json';
 
+axios.defaults.baseURL = packageJson.proxy;
 function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/" component={AuthenticationView} />
-        <PrivateRoute exact path="/home" component={HomeView} />
+        <Route exact path="/login" component={AuthenticationView} />
+        <PrivateRoute exact path="/" component={HomeView} />
       </Switch>
     </Router>
   );

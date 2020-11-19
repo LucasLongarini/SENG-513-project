@@ -1,17 +1,46 @@
-import React, {useState} from 'react';
-import IconButton from '@material-ui/core/IconButton';
+import { React, useState, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import TextField from '@material-ui/core/TextField';
+import { TextField, Grid, IconButton } from '@material-ui/core';
 import Logo from '../../../../assets/images/logo.png';
-import Grid from '@material-ui/core/Grid';
 import Views from '../../State/Views';
 import DisplayIconPicker from '../DisplayIconPicker/DisplayIconPicker';
 import Emojis from '../../../../assets/images/DisplayEmojis/DisplayEmojis';
+import Axios from 'axios';
 
 
 function RegisterView(props) {
 
     const [emojiIndex, setEmojiIndex] = useState(0);
+    const router = useHistory();
+    const email = useRef();
+    const password = useRef();
+    const name = useRef();
+
+    async function handleKeyPressed(e) {
+        if (e.key === 'Enter')
+          await handleRegister();
+    }
+    
+    async function handleRegister() {
+
+        try {
+            const response = await Axios.post('/user/register', { 
+                email: email.current ? email.current.value : undefined,
+                password: password.current ? password.current.value : undefined,
+                name: name.current ? name.current.value : "",
+                emojiId: emojiIndex,
+                isGuest: props.isGuest
+            });
+            
+            // register success
+            localStorage.setItem('token', response.data.token);
+            router.push("/");
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <div>
@@ -28,23 +57,23 @@ function RegisterView(props) {
             </Grid>
             
             <Grid item xs={12}>
-                <TextField id="display-name" label="Display Name" variant="outlined" fullWidth/>
+                <TextField onKeyDown={handleKeyPressed} inputRef={name} label="Display Name" variant="outlined" fullWidth/>
             </Grid>
 
             { !props.isGuest &&
                 <Grid item xs={12}>
-                    <TextField id="email" label="Email" variant="outlined" fullWidth type="email"/>
+                    <TextField onKeyDown={handleKeyPressed} inputRef={email} label="Email" variant="outlined" fullWidth type="email"/>
                 </Grid>
             }
 
             { !props.isGuest &&
                 <Grid item xs={12}>
-                    <TextField id="password" label="Password" variant="outlined" fullWidth type="password"/>
+                    <TextField onKeyDown={handleKeyPressed} inputRef={password} label="Password" variant="outlined" fullWidth type="password"/>
                 </Grid>
             }  
             
             <Grid item xs={12}>
-                <button className='login-button login-color'>{props.isGuest ? "Play" : "Register"}</button>
+                <button onClick={handleRegister} className='login-button login-color'>{props.isGuest ? "Play" : "Register"}</button>
             </Grid>
             </Grid>
         </div>
