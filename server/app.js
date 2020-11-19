@@ -1,16 +1,30 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-
+const mongoose = require('mongoose');
+require('dotenv').config()
 // middleware
 app.use(express.json());
+
+// DB
+mongoose.connect(process.env.DB_CONNECTION, { 
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+var db = mongoose.connection;
+
+db.on("error", console.error.bind(console, "connection error:"));
+
+db.once("open", function() {
+  console.log("Connection Successful!");
+});
 
 // Routes
 const userRoutes = require('./api/routes/users');
 app.use('/user', userRoutes);
 
 // Server start
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.listen(port, ()=>{
     console.log("Server listening on port "+port)
 });
