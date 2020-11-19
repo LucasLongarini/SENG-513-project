@@ -2,9 +2,12 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
-require('dotenv').config()
+require('dotenv').config();
+const auth = require('./api/auth');
+
 // middleware
 app.use(express.json());
+app.use(auth);
 
 // DB
 mongoose.connect(process.env.DB_CONNECTION, { 
