@@ -13,6 +13,7 @@ app.use(auth);
 mongoose.connect(process.env.DB_CONNECTION, { 
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
 });
 var db = mongoose.connection;
 
