@@ -2,7 +2,9 @@
 import Axios from 'axios';
 
 const AuthenticationService = {
-    isAuthenticated: false,
+    isAuthenticated() {
+        return localStorage.getItem('token');    
+    },
 
     verifyToken: () => {
         var promise = new Promise((resolve, reject) => {
@@ -18,12 +20,24 @@ const AuthenticationService = {
                     'token': token
                 }
             })
-            .then(() => resolve("Token is valid"))
-            .catch(() => reject(Error("Token is not valid")))
+            .then(() => {
+                resolve("Token is valid")
+            })
+            .catch(() => {
+                reject(Error("Token is not valid"))
+            })
                 
         });
         return promise;
     },
+
+    saveToken(token){
+        localStorage.setItem('token', token);
+    },
+
+    deleteToken() {
+
+    }
     
 };
 

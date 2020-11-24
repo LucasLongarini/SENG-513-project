@@ -5,6 +5,11 @@ import { IconButton, TextField, Grid } from '@material-ui/core';
 import Logo from '../../../../assets/images/logo.png';
 import Views from '../../State/Views';
 import Axios from 'axios';
+import authenticationService from '../../../../services/AuthenticationService';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+toast.configure();
 
 function LoginView(props) {
 
@@ -26,11 +31,14 @@ function LoginView(props) {
       });
       
       // login success
-      localStorage.setItem('token', response.data.token);
+      authenticationService.saveToken(response.data.token);
+  
+      await authenticationService.verifyToken();
       router.push("/");
+      
     }
     catch (error) {
-      console.log(error);
+      toast.error("Authentication error");
     }
   }
 

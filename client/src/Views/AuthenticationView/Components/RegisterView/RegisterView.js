@@ -7,7 +7,11 @@ import Views from '../../State/Views';
 import DisplayIconPicker from '../DisplayIconPicker/DisplayIconPicker';
 import Emojis from '../../../../assets/images/DisplayEmojis/DisplayEmojis';
 import Axios from 'axios';
+import authenticationService from '../../../../services/AuthenticationService';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+toast.configure();
 
 function RegisterView(props) {
 
@@ -34,11 +38,13 @@ function RegisterView(props) {
             });
             
             // register success
-            localStorage.setItem('token', response.data.token);
+            authenticationService.saveToken(response.data.token);
+
+            await authenticationService.verifyToken();
             router.push("/");
         }
         catch (error) {
-            console.log(error);
+            toast.error("Authentication error");
         }
     }
 
