@@ -2,8 +2,6 @@ const { request } = require('express');
 const jwt = require ('jsonwebtoken');
 
 module.exports = (req, res, next) =>{
-    if (req.path == '/' || req.path == '/user/register' || req.path == '/user/login')
-        return next();
     
     var token = req.headers.token;
     if (!token) {

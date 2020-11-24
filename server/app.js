@@ -8,7 +8,7 @@ const cors = require('cors')
 
 // middleware
 app.use(express.json());
-app.use(auth);
+// app.use(auth);
 app.use(cors()); // enable CORS for development 
 
 // DB
@@ -39,9 +39,9 @@ app.listen(port, ()=>{
 // Serving web page
 app.use(express.static(path.join(__dirname, "../client/build")));
 
-app.get('/', (req, res) => {
-    res.sendStatus(200);
-    // res.sendFile(path.join(__dirname, "../client/build/index.html"));
+app.get('/*', (req, res) => {
+    //res.sendStatus(200);
+    res.sendFile(path.join(__dirname, "../client/build/index.html"));
 })
 
 // Error handling

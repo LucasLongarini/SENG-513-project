@@ -3,8 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
+const auth = require('../auth');
 
-//TODO check if display name is taken??
 router.post('/register', async (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
@@ -120,7 +120,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/verify', async (req, res) => {
+router.get('/verify', auth, async (req, res) => {
     // Because of the auth middleware if the request makes it here, the token is verified
     res.sendStatus(200);
 });
