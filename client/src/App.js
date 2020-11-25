@@ -7,6 +7,7 @@ import {
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AuthenticationView from './Views/AuthenticationView/AuthenticationView';
 import HomeView from './Views/HomeView/HomeView';
+import CreateLobbyView from './Views/CreateLobbyView/CreateLobbyView';
 import axios from 'axios';
 import packageJson from '../package.json';
 
@@ -15,8 +16,10 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/login" component={AuthenticationView} />
-        <PrivateRoute exact path="/" component={HomeView} />
+        {/* TODO remove */}
+        {/* <Route exact path="/login" component={AuthenticationView} />
+        <PrivateRoute exact path="/" component={HomeView} /> */}
+        <Route exact path="/create" component={CreateLobbyView} />
       </Switch>
     </Router>
   );
