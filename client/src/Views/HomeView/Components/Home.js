@@ -65,7 +65,7 @@ const Home = (props) => {
                         <Lobbies/>
                     </Paper>
                 </Grid>
-                <Grid item xs={4} sm={4}>
+                <Grid item xs={12} sm={4}>
                     <Paper className={classes.paper, classes.userProfile}><UserProfile/></Paper>
                 </Grid>
             </Grid>

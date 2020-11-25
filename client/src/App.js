@@ -7,6 +7,7 @@ import {
 import PrivateRoute from './components/PrivateRoute.js';
 import AuthenticationView from './Views/AuthenticationView/AuthenticationView';
 import HomeView from './Views/HomeView/HomeView';
+import GameView from './Views/GameView/GameView.js';
 import axios from 'axios';
 import packageJson from '../package.json';
 
@@ -18,6 +19,7 @@ function App() {
       <Switch>
         <Route exact path="/login" component={AuthenticationView} />
         {isDev ? <Route exact path="/" component={HomeView} /> : <PrivateRoute exact path="/" component={HomeView} />}
+        {isDev ? <Route exact path="/game-view" component={GameView} /> : <PrivateRoute exact path="/" component={GameView} />}
       </Switch>
     </Router>
   );
