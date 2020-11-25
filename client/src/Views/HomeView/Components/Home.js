@@ -2,6 +2,7 @@ import { React, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Background from '../../../assets/images/Authpage_background.jpg';
+import DoodleHeader from '../../../components/DoodlerHeader.js'
 import Lobbies from './Lobbies';
 import UserProfile from './UserProfile';
 import {
@@ -57,12 +58,10 @@ const Home = (props) => {
     return (
         <div className={classes.root}>
             <Grid className={classes.gridContainer} container spacing={3}>
-                <Grid item xs={12} sm={12}>
-                    <Paper className={classes.paper}><img className={classes.logo} alt="Logo" src={Logo}></img></Paper>
-                </Grid>
+                    <DoodleHeader />
                 <Grid item xs={12} sm={8}>
                     <Paper className={classes.paper, classes.lobbies}>
-                        <Typography variant="h5">We found some games that would love to have you!</Typography><br/>
+                        <Typography variant="h5">We found some games that you could join!</Typography><br/>
                         <Lobbies/>
                     </Paper>
                 </Grid>

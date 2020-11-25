@@ -4,7 +4,7 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
-import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import PrivateRoute from './components/PrivateRoute.js';
 import AuthenticationView from './Views/AuthenticationView/AuthenticationView';
 import HomeView from './Views/HomeView/HomeView';
 import axios from 'axios';
