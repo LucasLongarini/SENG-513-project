@@ -1,0 +1,30 @@
+.CreateLobbyView-container {
+    display: flex;
+    flex-direction: row;
+    width: 800px; height: 500px;
+    align-content: center;
+    align-items: center;
+    margin: 8px;
+}
+
+.CreateLobbyView {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media screen and (max-width: 800px) {
+    .CreateLobbyView-container {
+      width: 500px; height: 600px;
+      flex-direction: column-reverse;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .CreateLobbyView-container {
+      width: 100%;
+      flex-direction: column-reverse;
+    }
+}

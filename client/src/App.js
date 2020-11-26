@@ -17,6 +17,7 @@ function App() {
   return (
     <Router>
       <Switch>
+        {/* TODO switch back to homeView */}
         <Route exact path="/login" component={AuthenticationView} />
         {isDev ? <Route exact path="/" component={HomeView} /> : <PrivateRoute exact path="/" component={HomeView} />}
         {isDev ? <Route exact path="/game-view" component={GameView} /> : <PrivateRoute exact path="/" component={GameView} />}
