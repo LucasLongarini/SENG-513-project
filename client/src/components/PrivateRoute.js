@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import authenticationService from '../../services/AuthenticationService';
+import authenticationService from '../services/AuthenticationService';
 
 function PrivateRoute ({ component: Component, ...rest }) {
     
