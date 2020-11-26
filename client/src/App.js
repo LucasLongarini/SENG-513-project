@@ -16,10 +16,9 @@ function App() {
   return (
     <Router>
       <Switch>
-        {/* TODO remove */}
-        {/* <Route exact path="/login" component={AuthenticationView} />
-        <PrivateRoute exact path="/" component={HomeView} /> */}
-        <Route exact path="/create" component={CreateLobbyView} />
+        {/* TODO switch back to homeView */}
+        <Route exact path="/login" component={AuthenticationView} />
+        <PrivateRoute exact path="/" component={CreateLobbyView} />
       </Switch>
     </Router>
   );

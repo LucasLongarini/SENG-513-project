@@ -37,6 +37,10 @@ const AuthenticationService = {
 
     deleteToken() {
 
+    },
+
+    getToken() {
+        return localStorage.getItem('token');
     }
     
 };
