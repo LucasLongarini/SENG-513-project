@@ -27,7 +27,9 @@ db.once("open", function() {
 
 // Routes
 const userRoutes = require('./api/routes/users');
+const roomRoutes = require('./api/routes/room');
 app.use('/user', userRoutes);
+app.use('/room', roomRoutes);
 
 
 // Server start
