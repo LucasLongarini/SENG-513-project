@@ -1,5 +1,4 @@
 import { React, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { IconButton, TextField, Grid } from '@material-ui/core';
 import Logo from '../../../../assets/images/logo.png';
@@ -13,7 +12,6 @@ toast.configure();
 
 function LoginView(props) {
 
-  const router = useHistory();
   const email = useRef();
   const password = useRef();
   
@@ -36,8 +34,7 @@ function LoginView(props) {
       authenticationService.saveEmojiId(response.data.user.emojiId);
       
       await authenticationService.verifyToken();
-      router.push("/");
-      
+      props.handleRedirect();     
     }
     catch (error) {
       toast.error("Authentication error");

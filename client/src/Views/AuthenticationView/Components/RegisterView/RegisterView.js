@@ -1,5 +1,4 @@
 import { React, useState, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { TextField, Grid, IconButton } from '@material-ui/core';
 import Logo from '../../../../assets/images/logo.png';
@@ -16,7 +15,6 @@ toast.configure();
 function RegisterView(props) {
 
     const [emojiIndex, setEmojiIndex] = useState(0);
-    const router = useHistory();
     const email = useRef();
     const password = useRef();
     const name = useRef();
@@ -43,7 +41,7 @@ function RegisterView(props) {
             authenticationService.saveEmojiId(response.data.user.emojiId);
 
             await authenticationService.verifyToken();
-            router.push("/");
+            props.handleRedirect();     
         }
         catch (error) {
             toast.error("Authentication error");
