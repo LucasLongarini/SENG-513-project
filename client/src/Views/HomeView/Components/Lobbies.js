@@ -37,33 +37,6 @@ const LobbyTableCell = withStyles((theme) => ({
       },
     },
   }))(TableRow);
-  
-  function createData(roomNumber, status, spellCheck, players) {
-    return { roomNumber, status, spellCheck, players };
-  }
-  
-  const rows = [
-    createData('0001', 'Open', true, '1/8'),
-    createData('0002', 'Open', false, '2/8'),
-    createData('0003', 'Round 2/8', true, '3/8'),
-    createData('0004', 'Open', true, '4/8'),
-    createData('0005', 'Round 6/9', false, '5/8'),
-    createData('0001', 'Open', true, '1/8'),
-    createData('0002', 'Open', false, '2/8'),
-    createData('0003', 'Round 2/8', true, '3/8'),
-    createData('0004', 'Open', true, '4/8'),
-    createData('0005', 'Round 6/9', false, '5/8'),
-    createData('0001', 'Open', true, '1/8'),
-    createData('0002', 'Open', false, '2/8'),
-    createData('0003', 'Round 2/8', true, '3/8'),
-    createData('0004', 'Open', true, '4/8'),
-    createData('0005', 'Round 6/9', false, '5/8'),
-    createData('0001', 'Open', true, '1/8'),
-    createData('0002', 'Open', false, '2/8'),
-    createData('0003', 'Round 2/8', true, '3/8'),
-    createData('0004', 'Open', true, '4/8'),
-    createData('0005', 'Round 6/9', false, '5/8'),
-  ];
 
 const useStyles = makeStyles((theme) => ({
     tableContainer: {
@@ -76,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Lobbies = (props) => {
+const Lobbies = ({rooms}) => {
     const classes = useStyles();
     const router = useHistory();
 
@@ -95,14 +68,14 @@ const Lobbies = (props) => {
           </TableHead>
           
           <TableBody>
-            {rows.map((row) => (
-              <LobbyTableRow key={row.name}>
+            {rooms.map((room) => (
+              <LobbyTableRow key={room.id}>
                 <LobbyTableCell component="th" scope="row">
-                  <Typography variant="h6">{row.roomNumber}</Typography>
+                  <Typography variant="h6">{room.id}</Typography>
                 </LobbyTableCell>
-                <LobbyTableCell align="right"><Typography variant="h6">{row.status}</Typography></LobbyTableCell>
-                <LobbyTableCell align="right">{row.spellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
-                <LobbyTableCell align="right"><Typography variant="h6">{row.players}</Typography></LobbyTableCell>
+                <LobbyTableCell align="right"><Typography variant="h6">{room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
+                <LobbyTableCell align="right">{room.isSpellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
+                <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userIds.length}/8`}</Typography></LobbyTableCell>
                 <LobbyTableCell align="right"><Button variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
               </LobbyTableRow>
             ))}

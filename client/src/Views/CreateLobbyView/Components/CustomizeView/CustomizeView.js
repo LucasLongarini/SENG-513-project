@@ -3,16 +3,18 @@ import './CustomizeView.css';
 import { Button, TextField, Switch, FormControlLabel, FormControl, Select, InputLabel, IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import _ from "lodash";
+import { useHistory } from 'react-router-dom';
 
+// TODO handle user exit
 function CustomizeView(props) {
-
-  const [isPrivate, setIsPrivate] = useState(false);
-  const [password, setPassword] = useState("");
-  const [rounds, setRounds] = useState(1);
-  const [timer, setTimer] = useState(30);
-  const [isSpellcheck, setIsSpellcheck] = useState(false);
-  // const delayPassword = useRef(_.debounce(value => updatePassword(value), 500), []).current;
-  const delayPassword = _.debounce(value => updatePassword(value), 500);
+  console.log(props.initialRoomSettings);
+  const router = useHistory();
+  const [isPrivate, setIsPrivate] = useState(props.initialRoomSettings.isPrivate);
+  const [password, setPassword] = useState(props.initialRoomSettings.password ? props.initialRoomSettings.password : "");
+  const [rounds, setRounds] = useState(props.initialRoomSettings.rounds);
+  const [timer, setTimer] = useState(props.initialRoomSettings.timer);
+  const [isSpellcheck, setIsSpellcheck] = useState(props.isSpellcheck);
+  const delayPassword = useRef(_.debounce(value => updatePassword(value), 500), []).current;
 
   function onPasswordChanged(event) {
     setPassword(event.target.value);
@@ -49,7 +51,7 @@ function CustomizeView(props) {
         maxWidth:"150px", 
         margin:"8px 0 0 0", 
         fontSize:"15px"}} 
-        onClick={() => null}><ArrowBackIcon />Back to Lobby</IconButton>
+        onClick={() => router.push('/')}><ArrowBackIcon />Back to Lobby</IconButton>
       <h2>{`Room: ${props.roomId}`}</h2>
 
       <div className='CustomizeView-form'>

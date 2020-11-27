@@ -15,10 +15,40 @@
     align-items: center;
 }
 
+.CreateLobbyView-waiting {
+  background-color: white;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+  padding: 0 20px;
+  flex-direction: column;
+  text-align: center;
+}
+
+.CreateLobbyView-waiting h1{
+  font-size: 28px;
+}
+
+.CreateLobbyView-waiting h2{
+  margin-top: 20px;
+  font-size: 16px;
+}
+
 @media screen and (max-width: 800px) {
     .CreateLobbyView-container {
       width: 500px; height: 600px;
       flex-direction: column-reverse;
+    }
+
+    .CreateLobbyView-waiting {
+      background-color: white;
+      height: 50%;
+      width: 100%;
+      margin: 0 0 20px 0;
+      padding: 0;
     }
 }
 

@@ -4,8 +4,6 @@ const auth = require('../auth');
 const Room = require('../../models/Room');
 const mongoose = require('mongoose'); 
 
-router.get('/')
-
 router.post('/create', auth, async (req, res) => {
     var hostId = req.authData.id;
 
@@ -60,6 +58,7 @@ router.get('/find/:roomId', auth, async (req, res) => {
                 isPrivate: room.IsPrivate,
                 rounds: room.Rounds,
                 timer: room.Timer,
+                password: room.Password,
                 isSpellCheck: room.IsSpellCheck,
                 hostId: room.HostId,
                 userIds: room.UserIds,

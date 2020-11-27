@@ -39,6 +39,8 @@ function RegisterView(props) {
             
             // register success
             authenticationService.saveToken(response.data.token);
+            authenticationService.saveDisplayName(response.data.user.name);
+            authenticationService.saveEmojiId(response.data.user.emojiId);
 
             await authenticationService.verifyToken();
             router.push("/");

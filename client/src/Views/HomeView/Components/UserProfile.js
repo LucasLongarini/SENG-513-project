@@ -1,5 +1,4 @@
-import { React, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { React } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Emojis from '../../../assets/images/DisplayEmojis/DisplayEmojis';
 import {
@@ -8,9 +7,7 @@ import {
     Typography,
     Button,
 } from '@material-ui/core';
-// import Logo from '../../../../assets/images/logo.png';
-import Axios from 'axios';
-// import authenticationService from '../../../../services/AuthenticationService';
+import authenticationService from '../../../services/AuthenticationService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -41,9 +38,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UserProfile = (props) => {
+const displayName = authenticationService.getDisplayName();
+const emojiId = authenticationService.getEmojiId();
+
+const UserProfile = ({ handleCreate }) => {
     const classes = useStyles();
-    const router = useHistory();
 
     return (
         <div className={classes.root}>
@@ -51,8 +50,8 @@ const UserProfile = (props) => {
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <div>
-                            <img className={classes.displayIconEmoji} alt="Logo" src={Emojis[1]}></img>
-                            <Typography variant="h6">UserName</Typography>
+                            <img className={classes.displayIconEmoji} alt="User Icon" src={Emojis[emojiId]}></img>
+                            <Typography variant="h6">{displayName}</Typography>
                         </div>
                     </Paper>
                 </Grid>
@@ -60,7 +59,7 @@ const UserProfile = (props) => {
                     <Paper className={classes.paper}><Button size="large" fullWidth variant="contained" color="secondary">QUICK JOIN</Button></Paper>
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                    <Paper className={classes.paper}><Button onClick={() => router.push("/create-lobby")} size="large" fullWidth variant="contained" color="secondary">CREAT LOBBY</Button></Paper>
+                    <Paper className={classes.paper}><Button onClick={handleCreate} size="large" fullWidth variant="contained" color="secondary">CREAT LOBBY</Button></Paper>
                 </Grid>
             </Grid>
         </div>
