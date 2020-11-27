@@ -1,0 +1,43 @@
+.InviteLinkModal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.InviteLinkModal-content {
+    margin: auto;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 8px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    outline: none;
+    padding: 20px;
+    width: 400px;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.InviteLinkModal-content h3 {
+    text-align: center;
+}
+
+
+@media screen and (max-width: 800px) {
+    .InviteLinkModal-content {
+        width: 60%;
+    }
+
+    .InviteLinkModal-error {
+        padding: 40px 8px 60px 8px;
+    }
+
+}
+
+@media screen and (max-width: 400px) {
+    .CreateLobbyModal-content {
+      width: 80%;
+    }
+}

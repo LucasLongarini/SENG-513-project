@@ -7,13 +7,12 @@ import { useHistory } from 'react-router-dom';
 
 // TODO handle user exit
 function CustomizeView(props) {
-  console.log(props.initialRoomSettings);
   const router = useHistory();
   const [isPrivate, setIsPrivate] = useState(props.initialRoomSettings.isPrivate);
   const [password, setPassword] = useState(props.initialRoomSettings.password ? props.initialRoomSettings.password : "");
   const [rounds, setRounds] = useState(props.initialRoomSettings.rounds);
   const [timer, setTimer] = useState(props.initialRoomSettings.timer);
-  const [isSpellcheck, setIsSpellcheck] = useState(props.isSpellcheck);
+  const [isSpellcheck, setIsSpellcheck] = useState(props.initialRoomSettings.isSpellCheck);
   const delayPassword = useRef(_.debounce(value => updatePassword(value), 500), []).current;
 
   function onPasswordChanged(event) {
@@ -117,11 +116,11 @@ function CustomizeView(props) {
 
       </div>
         
-      <Button variant="contained" disableElevation style={{
-        backgroundColor: "#D6504F",
-        borderRadius: 0,
-        color: "white"
-      }}>    
+      <Button variant="contained" color="secondary" 
+        disableElevation style={{
+          borderRadius: 0,
+          color: "white"
+        }}>    
         Start Game
       </Button>
     </div>

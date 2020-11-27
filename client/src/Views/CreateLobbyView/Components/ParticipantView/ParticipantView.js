@@ -4,7 +4,7 @@ import GroupIcon from '@material-ui/icons/Group';
 import JoinedUser from '../JoinedUser/JoinedUser';
 import { Button } from '@material-ui/core';
 
-function ParticipantView(props) {
+function ParticipantView({handleInviteLink}) {
   return (
     <div className='ParticipantView-container'>
       <div className='joined-container'>
@@ -25,7 +25,7 @@ function ParticipantView(props) {
         backgroundColor: "#CE5BF7",
         borderRadius: 0,
         color: "white"
-      }}>
+      }} onClick={handleInviteLink}>
         Invite Link
       </Button>
     </div>

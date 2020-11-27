@@ -57,21 +57,7 @@ const Home = (props) => {
     const [rooms, setRooms] = useState([]);
 
     useEffect(() => {
-
-      async function getAllRooms() {
-        try {
-          const response = await Axios.get('/room/all', {
-            headers: {
-              token: authenticationService.getToken()
-            }
-          });
-          setRooms(response.data.rooms);
-        }
-        catch {}
-      }
-
       getAllRooms();
-
     }, [])
 
     async function handleCreate() {
@@ -88,6 +74,19 @@ const Home = (props) => {
         }  
     }
 
+    async function getAllRooms() {
+      try {
+        const response = await Axios.get('/room/all', {
+          headers: {
+            token: authenticationService.getToken()
+          }
+        });
+        setRooms(response.data.rooms);
+      }
+      catch {}
+    }
+
+
     return (
         <div className={classes.root}>
             <Grid className={classes.gridContainer} container spacing={3}>
@@ -95,7 +94,7 @@ const Home = (props) => {
                 <Grid item xs={12} sm={8}>
                     <Paper className={classes.paper, classes.lobbies}>
                         <Typography variant="h5">We found some games that you could join!</Typography><br/>
-                        <Lobbies rooms={rooms}/>
+                        <Lobbies refresh={getAllRooms} rooms={rooms}/>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={4}>

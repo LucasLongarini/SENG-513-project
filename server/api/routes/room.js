@@ -51,14 +51,15 @@ router.get('/find/:roomId', auth, async (req, res) => {
         if (room === undefined || room === null)
             return res.status(404).json({Error: "Room not found"});
         
+        let isHost = room.HostId.toString() === callerId
         res.status(200).json({
             room: {
                 id: room._id,
-                isHost: room.HostId.toString() === callerId,
+                isHost: isHost,
                 isPrivate: room.IsPrivate,
                 rounds: room.Rounds,
                 timer: room.Timer,
-                password: room.Password,
+                password: isHost ? room.Password : undefined,
                 isSpellCheck: room.IsSpellCheck,
                 hostId: room.HostId,
                 userIds: room.UserIds,
@@ -140,6 +141,30 @@ router.patch('/:roomId', auth, async (req, res) => {
         // console.log(error);
         return res.status(500).json({Error:"Server error"});
     }
+});
+
+router.post('/join/:roomId', auth, async (req, res) => {
+
+    let roomId = req.params.roomId;
+    let password = req.body.password;
+    if (password === undefined)
+        return res.status(400).json({Error: "Bad Request"});
+    
+    try {
+        let room = await Room.findOne({_id: mongoose.Types.ObjectId(roomId)});
+        if (room === null || room === undefined)
+            return res.status(404).json({Error: "Not Found"});
+        
+        if (password === room.Password || !room.IsPrivate) 
+            return res.sendStatus(200);
+        
+        res.sendStatus(400);
+    }
+    catch {
+        return res.status(500).json({Error:"Server error"});
+    }
+
+
 });
 
 module.exports = router;

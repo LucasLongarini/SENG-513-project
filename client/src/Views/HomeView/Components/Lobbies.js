@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {
     Paper,
-    Grid,
     Table,
     TableBody,
     TableCell, 
@@ -11,8 +10,10 @@ import {
     TableHead,
     TableRow,
     Button,
+    IconButton,
     Typography,
 } from '@material-ui/core';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import { Scrollbars } from 'react-custom-scrollbars';
 import SpellcheckIcon from '@material-ui/icons/Spellcheck';
 import { toast } from 'react-toastify';
@@ -28,9 +29,9 @@ const LobbyTableCell = withStyles((theme) => ({
     body: {
       fontSize: 14,
     },
-  }))(TableCell);
+}))(TableCell);
   
-  const LobbyTableRow = withStyles((theme) => ({
+const LobbyTableRow = withStyles((theme) => ({
     root: {
       '&:nth-of-type(odd)': {
         backgroundColor: theme.palette.action.hover,
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Lobbies = ({rooms}) => {
+const Lobbies = ({rooms, refresh}) => {
     const classes = useStyles();
     const router = useHistory();
 
@@ -63,7 +64,7 @@ const Lobbies = ({rooms}) => {
               <LobbyTableCell align="right">Status</LobbyTableCell>
               <LobbyTableCell align="right">Spellcheck</LobbyTableCell>
               <LobbyTableCell align="right">Players</LobbyTableCell>
-              <LobbyTableCell align="right"></LobbyTableCell>
+              <LobbyTableCell align="right"><IconButton onClick={refresh} variant="contained" style={{color: "#ffffff"}}><RefreshIcon/></IconButton></LobbyTableCell>
             </TableRow>
           </TableHead>
           
@@ -73,10 +74,10 @@ const Lobbies = ({rooms}) => {
                 <LobbyTableCell component="th" scope="row">
                   <Typography variant="h6">{room.id}</Typography>
                 </LobbyTableCell>
-                <LobbyTableCell align="right"><Typography variant="h6">{room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
+                <LobbyTableCell align="right"><Typography variant="h6">{!room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
                 <LobbyTableCell align="right">{room.isSpellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
                 <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userIds.length}/8`}</Typography></LobbyTableCell>
-                <LobbyTableCell align="right"><Button variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
+                <LobbyTableCell align="right"><Button onClick={() => router.push(`/rooms/${room.id}`)} variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
               </LobbyTableRow>
             ))}
           </TableBody>
