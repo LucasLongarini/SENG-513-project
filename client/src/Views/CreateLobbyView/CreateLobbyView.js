@@ -10,8 +10,10 @@ import CreateLobbyModal from './Components/CreateLobbyModal/CreateLobbyModal';
 import InviteLinkModal from './Components/InviteLinkModal/InviteLinkModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
 
 toast.configure();
+let socket;
 
 function CreateLobbyView(props) {
 
@@ -37,6 +39,11 @@ function CreateLobbyView(props) {
         setIsPrivateRoom(response.data.room.isPrivate);
         setIsValidRoom(true);
         
+        if (response.data.room.isHost)
+          connectToRoom();
+        else if (!response.data.room.isPrivate)
+          connectToRoom();
+        
       }
       catch {
         setIsValidRoom(false);
@@ -48,7 +55,9 @@ function CreateLobbyView(props) {
     GetRoomInformation();
 
     return () => { 
-      //User exits
+      if (socket) {
+        socket.disconnect();
+      }
     }
   }, []);
 
@@ -77,6 +86,7 @@ function CreateLobbyView(props) {
         }
       });
       setIsPrivateRoom(false);
+      connectToRoom();
     }
     catch (err){
       toast.error("Incorrect password")
@@ -86,6 +96,19 @@ function CreateLobbyView(props) {
 
   function handleInviteLink() {
     setIsInviteLinkOpen(true);
+  }
+
+  function connectToRoom() {
+    socket = io({
+      query: {
+        token: authenticationService.getToken(),
+        roomId: roomId,
+      }
+    });
+
+    socket.on('user joined', () => {
+      console.log('user joined');
+    });
   }
 
   return (
