@@ -57,31 +57,36 @@ const Lobbies = ({rooms, refresh}) => {
     return (
         <TableContainer className={classes.tableContainer} component={Paper}>
        <Scrollbars autoHide className={classes.scroll}>
-        <Table stickyHeader aria-label="lobby table">
-          <TableHead>
-            <TableRow>
-              <LobbyTableCell>Room #</LobbyTableCell>
-              <LobbyTableCell align="right">Status</LobbyTableCell>
-              <LobbyTableCell align="right">Spellcheck</LobbyTableCell>
-              <LobbyTableCell align="right">Players</LobbyTableCell>
-              <LobbyTableCell align="right"><IconButton onClick={refresh} variant="contained" style={{color: "#ffffff"}}><RefreshIcon/></IconButton></LobbyTableCell>
-            </TableRow>
-          </TableHead>
-          
-          <TableBody>
-            {rooms.map((room) => (
-              <LobbyTableRow key={room.id}>
-                <LobbyTableCell component="th" scope="row">
-                  <Typography variant="h6">{room.id}</Typography>
-                </LobbyTableCell>
-                <LobbyTableCell align="right"><Typography variant="h6">{!room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
-                <LobbyTableCell align="right">{room.isSpellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
-                <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userIds.length}/8`}</Typography></LobbyTableCell>
-                <LobbyTableCell align="right"><Button onClick={() => router.push(`/rooms/${room.id}`)} variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
-              </LobbyTableRow>
-            ))}
-          </TableBody>
-        </Table>
+        { (rooms.length != 0) &&
+            <Table stickyHeader aria-label="lobby table">
+            <TableHead>
+                <TableRow>
+                <LobbyTableCell>Room #</LobbyTableCell>
+                <LobbyTableCell align="right">Status</LobbyTableCell>
+                <LobbyTableCell align="right">Spellcheck</LobbyTableCell>
+                <LobbyTableCell align="right">Players</LobbyTableCell>
+                <LobbyTableCell align="right"><IconButton onClick={refresh} variant="contained" style={{color: "#ffffff"}}><RefreshIcon/></IconButton></LobbyTableCell>
+                </TableRow>
+            </TableHead>
+            
+            <TableBody>
+                {rooms.map((room) => (
+                <LobbyTableRow key={room.id}>
+                    <LobbyTableCell component="th" scope="row">
+                    <Typography variant="h6">{room.id}</Typography>
+                    </LobbyTableCell>
+                    <LobbyTableCell align="right"><Typography variant="h6">{!room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
+                    <LobbyTableCell align="right">{room.isSpellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
+                    <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userIds.length}/8`}</Typography></LobbyTableCell>
+                    <LobbyTableCell align="right"><Button onClick={() => router.push(`/rooms/${room.id}`)} variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
+                </LobbyTableRow>
+                ))}
+            </TableBody>
+            </Table>
+        }
+        { (rooms.length == 0) &&
+            'Maybe put some canvas element here when empty if time else just give em on these :('
+        }
         </Scrollbars>
       </TableContainer>
     );

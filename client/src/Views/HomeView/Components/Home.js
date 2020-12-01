@@ -60,6 +60,10 @@ const Home = (props) => {
       getAllRooms();
     }, [])
 
+    const getLoobbiesTableHeader = () => {
+        return `${rooms.length ? 'We found some games that you could join!' : 'No one is playing right now :( Start a game and invite your friends!'}`
+    }
+
     async function handleCreate() {
         try {
           const response = await Axios.post('/room/create', {}, {
@@ -86,14 +90,13 @@ const Home = (props) => {
       catch {}
     }
 
-
     return (
         <div className={classes.root}>
             <Grid className={classes.gridContainer} container spacing={3}>
                     <DoodleHeader />
                 <Grid item xs={12} sm={8}>
                     <Paper className={classes.paper, classes.lobbies}>
-                        <Typography variant="h5">We found some games that you could join!</Typography><br/>
+                        <Typography variant="h5">{getLoobbiesTableHeader()}</Typography><br/>
                         <Lobbies refresh={getAllRooms} rooms={rooms}/>
                     </Paper>
                 </Grid>

@@ -14,7 +14,7 @@ import packageJson from '../package.json';
 
 axios.defaults.baseURL = packageJson.proxy;
 function App() {
-  const isDev = false; // remove for production
+  const isDev = true; // remove for production
   return (
     <Router>
       <Switch>
