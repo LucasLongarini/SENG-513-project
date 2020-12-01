@@ -19,16 +19,28 @@ toast.configure();
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        // height: '100vh',
+        // width: '100vw',
+        // backgroundImage: `url(${Background})`,
+        // backgroundPosition: 'center center',
+        // backgroundRepeat: 'no-repeat',
+        // backgroundSize: 'cover',
+        // flexGrow: 1,
         height: '100vh',
-        widht: '100vw',
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundImage: `url(${Background})`,
+        flexGrow: 1,
     },
     game: {
-        backgroundColor: '#ffeaea',
+        // backgroundColor: '#ffeaea',
         // backgroundImage: 'url(https://maps.gstatic.com/mapfiles/santatracker/v201912242254/scenes/speedsketch/img/speedsketch-background.svg)',
-        backgroundImage: `url(${Background})`,
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
+        // backgroundImage: `url(${Background})`,
+        // backgroundPosition: 'center center',
+        // backgroundRepeat: 'no-repeat',
+        // backgroundSize: 'cover',
         display: 'flex',
         height: '100%',
         position: 'relative',
@@ -46,7 +58,18 @@ const useStyles = makeStyles((theme) => ({
         height: 50,
         cursor: 'none',
         pointerEvents: 'none',
-    }
+        zIndex:99999,
+        // display: 'none',
+    },
+    gridContainer: {
+        width: '100%',
+        height: '100%',
+      },
+      paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+      },
 }));
 
 const Game = (props) => {
@@ -61,11 +84,30 @@ const Game = (props) => {
     }
 
     return (
-        <div className={classes.root}>
-            <div className={classes.game} onMouseMove={(e) => onPenMove(e)}>
+        <div className={classes.root} >
+            <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
+            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
+                <DoodleHeader />
+                <Grid item xs={12} sm={1}>
+                     <Paper className={classes.paper}>
+                         Yo
+                     </Paper>
+                </Grid>
+                <Grid item xs={12} sm={10}>
+                    <div className={classes.game} >
+                        <GameBoard/>
+                    </div>
+                </Grid>
+                 <Grid item xs={12} sm={1}>
+                     <Paper className={classes.paper}>
+                         Momma
+                     </Paper>
+                </Grid>
+            </Grid>
+{ false &&            <div className={classes.game} onMouseMove={(e) => onPenMove(e)}>
                 <GameBoard/>
                 <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
-            </div>
+            </div>}
         </div>
     );
 }
