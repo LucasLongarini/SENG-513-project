@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../auth');
 const Room = require('../../models/Room');
+const User = require('../../models/User');
 const mongoose = require('mongoose'); 
 
 router.post('/create', auth, async (req, res) => {
@@ -51,7 +52,13 @@ router.get('/find/:roomId', auth, async (req, res) => {
         if (room === undefined || room === null)
             return res.status(404).json({Error: "Room not found"});
         
+        let users = await User.find({
+            _id: { $in: room.UserIds}
+        },
+        '_id Name EmojiId');
+
         let isHost = room.HostId.toString() === callerId
+
         res.status(200).json({
             room: {
                 id: room._id,
@@ -62,7 +69,13 @@ router.get('/find/:roomId', auth, async (req, res) => {
                 password: isHost ? room.Password : undefined,
                 isSpellCheck: room.IsSpellCheck,
                 hostId: room.HostId,
-                userIds: room.UserIds,
+                users: users.map((i) => {
+                    return {
+                        id: i._id,
+                        name: i.Name,
+                        emojiId: i.EmojiId
+                    }
+                }),
             }
         });  
     }
@@ -73,22 +86,25 @@ router.get('/find/:roomId', auth, async (req, res) => {
     
 });
 
+// gets all "Joinable" rooms (not full)
 router.get('/all', auth, async (req, res) => {
     var callerId = req.authData.id;
     
     try {        
         let rooms = [];
         for await (const room of Room.find()) {
-            rooms.push({
-                id: room._id,
-                isHost: room.HostId.toString() === callerId,
-                isPrivate: room.IsPrivate,
-                rounds: room.Rounds,
-                timer: room.Timer,
-                isSpellCheck: room.IsSpellCheck,
-                hostId: room.HostId,
-                userIds: room.UserIds,
-            });
+            if (room.UserIds.length < 8) {
+                rooms.push({
+                    id: room._id,
+                    isHost: room.HostId.toString() === callerId,
+                    isPrivate: room.IsPrivate,
+                    rounds: room.Rounds,
+                    timer: room.Timer,
+                    isSpellCheck: room.IsSpellCheck,
+                    hostId: room.HostId,
+                    userCount: room.UserIds.length,
+                });
+            }   
         }
         res.status(200).json({
             rooms : rooms

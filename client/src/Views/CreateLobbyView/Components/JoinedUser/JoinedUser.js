@@ -3,12 +3,13 @@ import './JoinedUser.css';
 import Emojis from '../../../../assets/images/DisplayEmojis/DisplayEmojis';
 import StarIcon from '@material-ui/icons/Star';
 
-function JoinedUser(props) {
+function JoinedUser({isHost, emojiId, name, isVisible}) {
   return (
     <div className='JoinedUser-container'>
-        <img className="JoinedUser-icon" alt="Username" src={Emojis[0]}></img>
-        <h6>Username</h6>
-        {props.isHost && <StarIcon className='leader-icon' style={{ color: "FFD700" }}/>}
+        <img style={{visibility: isVisible ? "visible" : "hidden"}}
+          className="JoinedUser-icon" alt="Username" src={Emojis[emojiId]}></img>
+        <h6 style={{visibility: isVisible ? "visible" : "hidden"}}>{name}</h6>
+        {isHost && <StarIcon className='leader-icon' style={{ color: "FFD700" }}/>}
     </div>
   );
 }

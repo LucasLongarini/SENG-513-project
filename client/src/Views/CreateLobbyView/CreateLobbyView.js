@@ -10,8 +10,10 @@ import CreateLobbyModal from './Components/CreateLobbyModal/CreateLobbyModal';
 import InviteLinkModal from './Components/InviteLinkModal/InviteLinkModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
 
 toast.configure();
+let socket;
 
 function CreateLobbyView(props) {
 
@@ -22,6 +24,9 @@ function CreateLobbyView(props) {
   const [initialRoomSettings, setRoomSettings] = useState({});
   const [isValidRoom, setIsValidRoom] = useState(true);
   const [isInviteLinkOpen, setIsInviteLinkOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [hostId, setHostId] = useState("");
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
 
@@ -36,6 +41,13 @@ function CreateLobbyView(props) {
         setRoomSettings(response.data.room);
         setIsPrivateRoom(response.data.room.isPrivate);
         setIsValidRoom(true);
+        setUsers(response.data.room.users);
+        setHostId(response.data.room.hostId);
+        
+        if (response.data.room.isHost)
+          connectToRoom();
+        else if (!response.data.room.isPrivate)
+          connectToRoom();
         
       }
       catch {
@@ -48,9 +60,27 @@ function CreateLobbyView(props) {
     GetRoomInformation();
 
     return () => { 
-      //User exits
+      if (socket) {
+        socket.disconnect();
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (socket !== undefined) {
+      socket.on('user connected', (user) => {
+        userConnected(user);
+      });
+  
+      socket.on('user disconnected', (userId) => {
+        userDisconnected(userId);
+      });
+
+      socket.on('new host', hostId => {
+        setHostId(hostId);
+      })
+    }
+  }, [users, connected])
 
   async function updateRoom(updatedData) {
     try {
@@ -77,6 +107,7 @@ function CreateLobbyView(props) {
         }
       });
       setIsPrivateRoom(false);
+      connectToRoom();
     }
     catch (err){
       toast.error("Incorrect password")
@@ -88,10 +119,31 @@ function CreateLobbyView(props) {
     setIsInviteLinkOpen(true);
   }
 
+  function connectToRoom() {
+    socket = io({
+      query: {
+        token: authenticationService.getToken(),
+        roomId: roomId,
+      }
+    });
+    setConnected(true);
+  }
+
+  function userConnected(user) {
+    if (!users.find(i => i.id === user.id)) {
+      setUsers([...users, user]);
+    }
+  }
+
+  function userDisconnected(userId) {
+    let newUsers = users.filter(i => i.id !== userId);
+    setUsers(newUsers);
+  }
+
   return (
     <div className='CreateLobbyView' style={{ backgroundImage: `url(${Background})` }}>     
         <div className='CreateLobbyView-container'>
-            <ParticipantView handleInviteLink={handleInviteLink}/>
+            <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             { isLoading ? 
               <div className="CreateLobbyView-waiting">
                   <h1>Loading...</h1>
