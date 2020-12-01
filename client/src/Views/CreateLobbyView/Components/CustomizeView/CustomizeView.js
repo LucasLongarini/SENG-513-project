@@ -116,7 +116,7 @@ function CustomizeView(props) {
 
       </div>
         
-      <Button variant="contained" color="secondary" 
+      <Button variant="contained" color="secondary" onClick={() => props.setIsGameStarted(true)}
         disableElevation style={{
           borderRadius: 0,
           color: "white"

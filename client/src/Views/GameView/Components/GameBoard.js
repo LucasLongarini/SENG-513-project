@@ -20,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
     gameBoard: {
         left: '15%',
         top: '5.3%',
-        // paddingBottom: '35.112%',
         position: 'relative',
         width: '60vw',
         height: '70vh',

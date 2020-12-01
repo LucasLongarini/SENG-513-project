@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Background from '../../../assets/images/Authpage_background.jpg';
 import DoodleHeader from '../../../components/DoodlerHeader.js'
-
 import GameBoard from './GameBoard.js'
 import {
     Paper,
@@ -19,13 +18,6 @@ toast.configure();
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        // height: '100vh',
-        // width: '100vw',
-        // backgroundImage: `url(${Background})`,
-        // backgroundPosition: 'center center',
-        // backgroundRepeat: 'no-repeat',
-        // backgroundSize: 'cover',
-        // flexGrow: 1,
         height: '100vh',
         width: '100vw',
         display: 'flex',
@@ -35,12 +27,6 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
     },
     game: {
-        // backgroundColor: '#ffeaea',
-        // backgroundImage: 'url(https://maps.gstatic.com/mapfiles/santatracker/v201912242254/scenes/speedsketch/img/speedsketch-background.svg)',
-        // backgroundImage: `url(${Background})`,
-        // backgroundPosition: 'center center',
-        // backgroundRepeat: 'no-repeat',
-        // backgroundSize: 'cover',
         display: 'flex',
         height: '100%',
         position: 'relative',
@@ -51,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',
         top: '0',
-        height: '25.5%',
         left: '0',
         position: 'absolute',
         width: 50,
@@ -59,7 +44,6 @@ const useStyles = makeStyles((theme) => ({
         cursor: 'none',
         pointerEvents: 'none',
         zIndex:99999,
-        // display: 'none',
     },
     gridContainer: {
         width: '100%',
@@ -73,8 +57,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Game = (props) => {
+    const {
+        participants,
+        initialRoomSettings,
+        roomId,
+        socketRef,
+    } = props;
     const gameBoardPenRef = useRef(null);
-
     const classes = useStyles();
     const router = useHistory();
 
@@ -90,24 +79,22 @@ const Game = (props) => {
                 <DoodleHeader />
                 <Grid item xs={12} sm={1}>
                      <Paper className={classes.paper}>
-                         Yo
+                         {participants}
                      </Paper>
                 </Grid>
-                <Grid item xs={12} sm={10}>
+                <Grid item xs={8} sm={10}>
                     <div className={classes.game} >
-                        <GameBoard/>
+                        <GameBoard
+                            socketRef={socketRef}
+                        />
                     </div>
                 </Grid>
-                 <Grid item xs={12} sm={1}>
+                 <Grid item xs={4} sm={1}>
                      <Paper className={classes.paper}>
-                         Momma
+                         Yo Momma
                      </Paper>
                 </Grid>
             </Grid>
-{ false &&            <div className={classes.game} onMouseMove={(e) => onPenMove(e)}>
-                <GameBoard/>
-                <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
-            </div>}
         </div>
     );
 }
