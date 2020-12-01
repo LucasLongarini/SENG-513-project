@@ -5,11 +5,12 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 const path = require('path');
 const mongoose = require('mongoose');
+const cors = require('cors')
 require('dotenv').config();
 
 // middleware
 app.use(express.json());
-
+app.use(cors());
 
 // DB
 mongoose.connect(process.env.DB_CONNECTION, { 
