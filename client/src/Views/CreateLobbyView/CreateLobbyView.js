@@ -24,6 +24,9 @@ function CreateLobbyView(props) {
   const [initialRoomSettings, setRoomSettings] = useState({});
   const [isValidRoom, setIsValidRoom] = useState(true);
   const [isInviteLinkOpen, setIsInviteLinkOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [hostId, setHostId] = useState("");
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
 
@@ -38,6 +41,8 @@ function CreateLobbyView(props) {
         setRoomSettings(response.data.room);
         setIsPrivateRoom(response.data.room.isPrivate);
         setIsValidRoom(true);
+        setUsers(response.data.room.users);
+        setHostId(response.data.room.hostId);
         
         if (response.data.room.isHost)
           connectToRoom();
@@ -60,6 +65,22 @@ function CreateLobbyView(props) {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (socket !== undefined) {
+      socket.on('user connected', (user) => {
+        userConnected(user);
+      });
+  
+      socket.on('user disconnected', (userId) => {
+        userDisconnected(userId);
+      });
+
+      socket.on('new host', hostId => {
+        setHostId(hostId);
+      })
+    }
+  }, [users, connected])
 
   async function updateRoom(updatedData) {
     try {
@@ -105,16 +126,24 @@ function CreateLobbyView(props) {
         roomId: roomId,
       }
     });
+    setConnected(true);
+  }
 
-    socket.on('user joined', () => {
-      console.log('user joined');
-    });
+  function userConnected(user) {
+    if (!users.find(i => i.id === user.id)) {
+      setUsers([...users, user]);
+    }
+  }
+
+  function userDisconnected(userId) {
+    let newUsers = users.filter(i => i.id !== userId);
+    setUsers(newUsers);
   }
 
   return (
     <div className='CreateLobbyView' style={{ backgroundImage: `url(${Background})` }}>     
         <div className='CreateLobbyView-container'>
-            <ParticipantView handleInviteLink={handleInviteLink}/>
+            <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             { isLoading ? 
               <div className="CreateLobbyView-waiting">
                   <h1>Loading...</h1>
