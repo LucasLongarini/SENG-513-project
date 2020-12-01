@@ -76,7 +76,7 @@ const Lobbies = ({rooms, refresh}) => {
                 </LobbyTableCell>
                 <LobbyTableCell align="right"><Typography variant="h6">{!room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
                 <LobbyTableCell align="right">{room.isSpellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
-                <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userIds.length}/8`}</Typography></LobbyTableCell>
+                <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userCount}/8`}</Typography></LobbyTableCell>
                 <LobbyTableCell align="right"><Button onClick={() => router.push(`/rooms/${room.id}`)} variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
               </LobbyTableRow>
             ))}
