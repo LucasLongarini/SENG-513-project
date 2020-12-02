@@ -23,6 +23,14 @@ module.exports = async function(io) {
         userHasConnected(io, userId, roomId);
             //socket.emit('disconnect');
 
+        //TODO check if there is a game in progress. If so, emit that data back to the socket
+
+
+        // Room settings updating event
+        socket.on('update room settings', setting => {
+            socket.broadcast.to(roomId).emit('new room settings', setting);
+        });
+
         socket.on('disconnect', () => {
             userHasDisconnected(io, userId, roomId);
         });

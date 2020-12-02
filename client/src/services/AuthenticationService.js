@@ -4,6 +4,8 @@ import Axios from 'axios';
 const tokenName = 'token';
 const displayName = 'displayName';
 const emojiName = 'emojiId';
+const isGuestName = 'isGuest';
+const idName = 'id';
 
 const AuthenticationService = {
 
@@ -72,6 +74,30 @@ const AuthenticationService = {
 
     deleteEmojiId() {
         localStorage.removeItem(emojiName);
+    },
+
+    saveIsGuest(value) {
+        localStorage.setItem(isGuestName, `${value}`);
+    },
+
+    getIsGuest() {
+        return (localStorage.getItem(isGuestName) == 'true');
+    },
+
+    deleteIsGuest() {
+        localStorage.removeItem(isGuestName);
+    },
+
+    saveId(id) {
+        localStorage.setItem(idName, `${id}`);
+    },
+
+    getId() {
+        return localStorage.getItem(idName);
+    },
+
+    deleteId() {
+        localStorage.removeItem(idName);
     },
     
 };

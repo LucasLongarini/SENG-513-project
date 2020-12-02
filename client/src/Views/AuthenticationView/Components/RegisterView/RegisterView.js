@@ -39,6 +39,8 @@ function RegisterView(props) {
             authenticationService.saveToken(response.data.token);
             authenticationService.saveDisplayName(response.data.user.name);
             authenticationService.saveEmojiId(response.data.user.emojiId);
+            authenticationService.saveIsGuest(response.data.user.isGuest);
+            authenticationService.saveId(response.data.user.id);
 
             await authenticationService.verifyToken();
             props.handleRedirect();     

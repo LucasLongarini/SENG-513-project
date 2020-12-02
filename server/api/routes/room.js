@@ -183,4 +183,23 @@ router.post('/join/:roomId', auth, async (req, res) => {
 
 });
 
+router.get('/random', auth, async (req, res) => {
+
+    try {
+        let rooms = await Room.find({IsPrivate: false});
+
+        if (rooms.length > 0) {
+            let index = Math.floor(Math.random() * rooms.length);
+            return res.status(200).json({
+                roomId: rooms[index]._id
+            });
+        }
+        else
+            res.sendStatus(404);
+    }
+    catch {
+        res.sendStatus(404);
+    }
+});
+
 module.exports = router;
