@@ -9,8 +9,6 @@ import {
     Grid,
     Typography,
 } from '@material-ui/core';
-import Axios from 'axios';
-// import authenticationService from '../../../../services/AuthenticationService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -77,19 +75,15 @@ const Game = (props) => {
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
             <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
                 <DoodleHeader />
-                <Grid item xs={12} sm={1}>
-                     <Paper className={classes.paper}>
                          {participants}
-                     </Paper>
-                </Grid>
-                <Grid item xs={8} sm={10}>
+                <Grid item xs={8} sm={8}>
                     <div className={classes.game} >
                         <GameBoard
                             socketRef={socketRef}
                         />
                     </div>
                 </Grid>
-                 <Grid item xs={4} sm={1}>
+                 <Grid item xs={4} sm={2}>
                      <Paper className={classes.paper}>
                          Yo Momma
                      </Paper>

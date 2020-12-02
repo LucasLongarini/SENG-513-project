@@ -20,7 +20,7 @@
     margin: auto;
 }
 
-.JoinedUser-container h6 {
+.JoinedUser-container h5,h3 {
     text-align: center;
     margin-bottom: 10px;
     font-weight: 400;

@@ -57,7 +57,7 @@ const Lobbies = ({rooms, refresh}) => {
     return (
         <TableContainer className={classes.tableContainer} component={Paper}>
        <Scrollbars autoHide className={classes.scroll}>
-        { (rooms.length != 0) &&
+        { (rooms && rooms.length != 0) &&
             <Table stickyHeader aria-label="lobby table">
             <TableHead>
                 <TableRow>
@@ -77,7 +77,7 @@ const Lobbies = ({rooms, refresh}) => {
                     </LobbyTableCell>
                     <LobbyTableCell align="right"><Typography variant="h6">{!room.isPrivate ? "Open" : "Private"}</Typography></LobbyTableCell>
                     <LobbyTableCell align="right">{room.isSpellCheck ? <SpellcheckIcon color="secondary"/> : ''}</LobbyTableCell>
-                    <LobbyTableCell align="right"><Typography variant="h6">{ `${room.userIds.length}/8`}</Typography></LobbyTableCell>
+                    <LobbyTableCell align="right"><Typography variant="h6">{ `${room.usersIds && room.userIds.length}/8`}</Typography></LobbyTableCell>
                     <LobbyTableCell align="right"><Button onClick={() => router.push(`/rooms/${room.id}`)} variant="contained" color="secondary">JOIN</Button></LobbyTableCell>
                 </LobbyTableRow>
                 ))}

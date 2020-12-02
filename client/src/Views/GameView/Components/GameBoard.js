@@ -1,16 +1,7 @@
 import { React, useRef, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import Background from '../../../assets/images/Authpage_background.jpg';
-import DoodleHeader from '../../../components/DoodlerHeader.js'
-import CanvasDraw from "react-canvas-draw";
-import {
-    Paper,
-    Grid,
-    Typography,
-} from '@material-ui/core';
 import io from 'socket.io-client';
-import Axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,10 +9,10 @@ toast.configure();
 
 const useStyles = makeStyles((theme) => ({
     gameBoard: {
-        left: '15%',
-        top: '5.3%',
+        // left: '15%',
+        // top: '5.3%',
         position: 'relative',
-        width: '60vw',
+        width: '100%',
         height: '70vh',
     },
     gameBoardCanvas: {
@@ -54,7 +45,6 @@ const useStyles = makeStyles((theme) => ({
 
 const GameBoard = (props) => {
     const canvasRef = useRef(null);
-    const gameBoardPenRef = useRef(null);
     const socketRef = useRef();
     const [activeColor, setActiveColor] = useState('black');
     let isDrawing = false;
@@ -145,13 +135,6 @@ const GameBoard = (props) => {
         isDrawing = false;
         drawLine(currentX, currentY, getXCord(e), getYCord(e), activeColor, true);
     };
-
-    const onPenMove = (e) => {
-        console.log(e.pageX)
-        console.log(e.pageY)
-        gameBoardPenRef.current.style.left = `${e.pageX-50}px`;
-        gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
-    }
 
     const throttle = (callback, delay) => {
         let previousCall = new Date().getTime();

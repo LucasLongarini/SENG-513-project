@@ -8,7 +8,7 @@ function JoinedUser({isHost, emojiId, name, isVisible}) {
     <div className='JoinedUser-container'>
         <img style={{visibility: isVisible ? "visible" : "hidden"}}
           className="JoinedUser-icon" alt="Username" src={Emojis[emojiId]}></img>
-        <h6 style={{visibility: isVisible ? "visible" : "hidden"}}>{name}</h6>
+        <h3 style={{visibility: isVisible ? "visible" : "hidden"}}>{name}</h3>
         {isHost && <StarIcon className='leader-icon' style={{ color: "FFD700" }}/>}
     </div>
   );
