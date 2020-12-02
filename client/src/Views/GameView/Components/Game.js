@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     },
     game: {
         display: 'flex',
-        height: '100%',
+        // height: '100%',
         position: 'relative',
     },
     gameBoardPen: {
@@ -57,6 +57,8 @@ const useStyles = makeStyles((theme) => ({
 const Game = (props) => {
     const {
         participants,
+        chat,
+        gameHeader,
         initialRoomSettings,
         roomId,
         socketRef,
@@ -75,19 +77,16 @@ const Game = (props) => {
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
             <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
                 <DoodleHeader />
-                         {participants}
-                <Grid item xs={8} sm={8}>
+                {participants}
+                <Grid item spacing={3} xs={8} sm={8}>
+                    {gameHeader}
                     <div className={classes.game} >
                         <GameBoard
                             socketRef={socketRef}
                         />
                     </div>
                 </Grid>
-                 <Grid item xs={4} sm={2}>
-                     <Paper className={classes.paper}>
-                         Yo Momma
-                     </Paper>
-                </Grid>
+                {chat}
             </Grid>
         </div>
     );

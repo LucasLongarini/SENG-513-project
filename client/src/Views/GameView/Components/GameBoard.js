@@ -9,11 +9,10 @@ toast.configure();
 
 const useStyles = makeStyles((theme) => ({
     gameBoard: {
-        // left: '15%',
-        // top: '5.3%',
         position: 'relative',
+        top: '1vh',
         width: '100%',
-        height: '70vh',
+        height: '65vh',
     },
     gameBoardCanvas: {
         backgroundColor: 'white',

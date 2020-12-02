@@ -3,7 +3,8 @@ import Background from '../../assets/images/Authpage_background.jpg';
 import DoodleHeader from '../../components/DoodlerHeader.js'
 import ParticipantView  from './Components/ParticipantView/ParticipantView';
 import CustomizeView  from './Components/CustomizeView/CustomizeView';
-import GameView from '../GameView/GameView.js'
+import GameView from '../GameView/GameView.js';
+import ChatContainer from '../ChatView/ChatContainer.js';
 import './CreateLobbyView.css';
 import Axios from 'axios';
 import authenticationService from '../../services/AuthenticationService';
@@ -57,6 +58,15 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     maxHeight: '80vh',
     maxWidth: '25vw !important',
+  },
+  gameHeader: {
+    width: '100%',
+    height: '5vh',
+    textAlign: 'center',
+  },
+  gameHeaderPaper: {
+    width: '100%',
+    margin: 'auto'
   }
 }));
 
@@ -223,6 +233,20 @@ function CreateLobbyView(props) {
     </div>
   )
 
+  const renderGameHeaderContent = () => {
+    return (
+      <div >
+        <Paper className={classes.gameHeaderPaper}>
+          <Grid container className={classes.gameHeader}>
+              <Grid item xs={1} sm={3}>Time</Grid>
+              <Grid item xs={1} sm={3}>Round</Grid>
+              <Grid item xs={1} sm={6}>{`_ _ _ W O R D _ _ _`}</Grid>
+          </Grid>
+        </Paper>
+      </div>
+    )
+  }
+
   const renderViewContent = () => {
     console.log(roomId)
     if (!isGameStarted) {
@@ -254,8 +278,10 @@ function CreateLobbyView(props) {
       // );
     }
     return (
-      <GameView 
+      <GameView
+        gameHeader={renderGameHeaderContent()} 
         participants={<ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId} sm={2} xs={12}/>}
+        chat={<ChatContainer/>}
         initialRoomSettings={initialRoomSettings} 
         roomId={roomId}
         socketRef={socket}
