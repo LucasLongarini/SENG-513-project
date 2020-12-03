@@ -48,24 +48,6 @@ function ParticipantView({handleInviteLink, users, hostId, xs, sm}) {
   )
 
   return renderContent()
-  // (
-    // <div className='ParticipantView-container'>
-    //   <div className='joined-container'>
-    //     <GroupIcon/>
-    //     <h4>{`${users.length}/8`}</h4>
-    //   </div>
-    //   <div className='participant-grid'>
-    //     {getJoinedUsers()}
-    //   </div>
-    //   <Button variant="contained" disableElevation style={{
-    //     backgroundColor: "#CE5BF7",
-    //     borderRadius: 0,
-    //     color: "white"
-    //   }} onClick={handleInviteLink}>
-    //     Invite Link
-    //   </Button>
-    // </div>
-  // );
 }
 
 export default ParticipantView;
