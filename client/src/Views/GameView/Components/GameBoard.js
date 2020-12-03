@@ -155,9 +155,11 @@ const GameBoard = (props) => {
 
     const onDrawingEvent = (data) => {
         const canvas = canvasRef.current;
-        const w = canvas.width;
-        const h = canvas.height;
-        drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+        if (canvas !== null) {
+            const w = canvas.width;
+            const h = canvas.height;
+            drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+        }
     }
     
     return (

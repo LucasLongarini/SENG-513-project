@@ -4,7 +4,6 @@ import DoodleHeader from '../../components/DoodlerHeader.js'
 import ParticipantView  from './Components/ParticipantView/ParticipantView';
 import CustomizeView  from './Components/CustomizeView/CustomizeView';
 import GameView from '../GameView/GameView.js';
-import ChatContainer from '../ChatView/ChatContainer.js';
 import './CreateLobbyView.css';
 import Axios from 'axios';
 import authenticationService from '../../services/AuthenticationService';
@@ -53,20 +52,12 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     width: 'auto',
     height: '80%',
+    background: 'red',
     alignItems: 'center',
     [theme.breakpoints.down('sm')]: {
       height: 'auto',
     }
   },
-  gameHeader: {
-    width: '100%',
-    height: '5vh',
-    textAlign: 'center',
-  },
-  gameHeaderPaper: {
-    width: '100%',
-    margin: 'auto'
-  }
 }));
 
 
@@ -226,45 +217,52 @@ function CreateLobbyView(props) {
             </Grid>
         </Grid>
       </Container>
-      {/* <CreateLobbyModal 
+      <CreateLobbyModal 
         isValidRoom={isValidRoom} 
         isHost={isHost} 
         isPrivateRoom={isPrivateRoom}
         validatePassword={validatePassword}
-      /> */}
+      />
       <InviteLinkModal isOpen={isInviteLinkOpen} setIsOpen={setIsInviteLinkOpen}/>
     </div>
   )
-
-  const renderGameHeaderContent = () => {
-    return (
-      <div >
-        <Paper className={classes.gameHeaderPaper}>
-          <Grid container className={classes.gameHeader}>
-              <Grid item xs={1} sm={3}>Time</Grid>
-              <Grid item xs={1} sm={3}>Round</Grid>
-              <Grid item xs={1} sm={6}>{`_ _ _ W O R D _ _ _`}</Grid>
-          </Grid>
-        </Paper>
-      </div>
-    )
-  }
 
   const renderViewContent = () => {
     if (!isGameStarted) {
       return createLobbyContent();
     }
     return (
-      <GameView
-        gameHeader={renderGameHeaderContent()} 
-        participants={<ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId} sm={2} xs={12}/>}
-        chat={<ChatContainer/>}
-        initialRoomSettings={initialRoomSettings} 
-        roomId={roomId}
-        socketRef={socket}
-      />
+      <div className={classes.root}>
+        <Grid className={classes.gridContainer} container spacing={3}>
+            <Grid item xs={12} className={classes.header}> 
+              <DoodleHeader />
+            </Grid>
+            <Grid item xs={2} className={classes.customizeViewGridItem}> 
+              <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+            </Grid>
+            <Grid item xs={10} className={classes.customizeViewGridItem}>
+              {
+                <GameView
+                  participants={<ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>}
+                  initialRoomSettings={initialRoomSettings} 
+                  roomId={roomId}
+                  socketRef={socket}
+                />
+              }
+            </Grid>
+        </Grid>
+        {/* <CreateLobbyModal 
+          isValidRoom={isValidRoom} 
+          isHost={isHost} 
+          isPrivateRoom={isPrivateRoom}
+          validatePassword={validatePassword}
+        /> */}
+        <InviteLinkModal isOpen={isInviteLinkOpen} setIsOpen={setIsInviteLinkOpen}/>
+      </div>
     )
   }
+
+  
 
   return (
     renderViewContent()

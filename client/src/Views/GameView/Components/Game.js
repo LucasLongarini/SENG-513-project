@@ -1,9 +1,8 @@
 import { React, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import Background from '../../../assets/images/Authpage_background.jpg';
-import DoodleHeader from '../../../components/DoodlerHeader.js'
 import GameBoard from './GameBoard.js'
+import Chat from '../Components/ChatView/ChatContainer';
 import {
     Paper,
     Grid,
@@ -16,17 +15,12 @@ toast.configure();
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: '100vh',
-        width: '100vw',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundImage: `url(${Background})`,
-        flexGrow: 1,
+        height: '100%',
+        width: '100%',
     },
     game: {
         display: 'flex',
-        // height: '100%',
+        height: '100%',
         position: 'relative',
     },
     gameBoardPen: {
@@ -51,14 +45,21 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
-      },
+    },
+    gameHeader: {
+        width: '100%',
+        height: '5vh',
+        textAlign: 'center',
+        verticalAlign: 'center',
+    },
+    gameHeaderPaper: {
+        width: '100%',
+        margin: 'auto'
+    }
 }));
 
 const Game = (props) => {
     const {
-        participants,
-        chat,
-        gameHeader,
         initialRoomSettings,
         roomId,
         socketRef,
@@ -72,24 +73,37 @@ const Game = (props) => {
         gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
     }
 
+    const renderGameHeaderContent = () => {
+        return (
+          <div >
+            <Paper className={classes.gameHeaderPaper}>
+              <Grid container className={classes.gameHeader}>
+                  <Grid item xs={1} sm={3}>Time</Grid>
+                  <Grid item xs={1} sm={3}>Round</Grid>
+                  <Grid item xs={1} sm={6}>{`S _ _ E _   M _ N`}</Grid>
+              </Grid>
+            </Paper>
+          </div>
+        )
+    }
+
     return (
         <div className={classes.root} >
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
             <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
-                <DoodleHeader />
-                {participants}
-                <Grid item spacing={3} xs={8} sm={8}>
-                    {gameHeader}
+                <Grid item spacing={3} xs={10}>
+                    {renderGameHeaderContent()}
                     <div className={classes.game} >
-                        <GameBoard
-                            socketRef={socketRef}
-                        />
+                        <GameBoard socketRef={socketRef} />
                     </div>
                 </Grid>
-                {chat}
+                <Grid item xs={2}>
+                    <Chat/>
+                </Grid>
             </Grid>
         </div>
     );
+    
 }
 
 export default Game;
