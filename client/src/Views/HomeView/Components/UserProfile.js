@@ -1,4 +1,4 @@
-import { React } from 'react';
+import { React, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Emojis from '../../../assets/images/DisplayEmojis/DisplayEmojis';
 import {
@@ -38,11 +38,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const displayName = authenticationService.getDisplayName();
-const emojiId = authenticationService.getEmojiId();
-
-const UserProfile = ({ handleCreate }) => {
+const UserProfile = ({ handleCreate, handleAutoJoin }) => {
     const classes = useStyles();
+
+    const [isGuest, setisGuest] = useState(false);
+    const [emojiId, setEmojiId] = useState(0);
+    const [displayName, setDisplayName] = useState("");
+
+    useEffect(() => {
+        setDisplayName(authenticationService.getDisplayName());
+        setEmojiId(authenticationService.getEmojiId());
+        setisGuest(authenticationService.getIsGuest());
+    }, []);
 
     return (
         <div className={classes.root}>
@@ -56,11 +63,13 @@ const UserProfile = ({ handleCreate }) => {
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                    <Paper className={classes.paper}><Button size="large" fullWidth variant="contained" color="secondary">QUICK JOIN</Button></Paper>
+                    <Paper className={classes.paper}><Button onClick={handleAutoJoin} size="large" fullWidth variant="contained" color="secondary">QUICK JOIN</Button></Paper>
                 </Grid>
+                { !isGuest &&
                 <Grid item xs={12} sm={12}>
                     <Paper className={classes.paper}><Button onClick={handleCreate} size="large" fullWidth variant="contained" color="secondary">CREAT LOBBY</Button></Paper>
                 </Grid>
+                }
             </Grid>
         </div>
     );

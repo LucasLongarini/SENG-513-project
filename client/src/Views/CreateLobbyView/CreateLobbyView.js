@@ -79,6 +79,8 @@ function CreateLobbyView(props) {
   const [hostId, setHostId] = useState("");
   const [connected, setConnected] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const [timer, setTimer] = useState("-");
+  const [rounds, setRounds] = useState("-");
 
   useEffect(() => {
 
@@ -95,6 +97,8 @@ function CreateLobbyView(props) {
         setIsValidRoom(true);
         setUsers(response.data.room.users);
         setHostId(response.data.room.hostId);
+        setTimer(response.data.room.timer);
+        setRounds(response.data.room.rounds);
         
         if (response.data.room.isHost)
           connectToRoom();
@@ -129,13 +133,36 @@ function CreateLobbyView(props) {
       });
 
       socket.on('new host', hostId => {
-        setHostId(hostId);
+        newHost(hostId);
       })
     }
   }, [users, connected])
 
+  useEffect(() => {
+    if (socket !== undefined) {
+      socket.on('new room settings', (data) => {
+        if (data.timer !== undefined) {
+          setTimer(data.timer);
+        }
+        if (data.rounds !== undefined) {
+          setRounds(data.rounds);
+        }
+      });
+    }
+  }, [timer, rounds, connected]);
+
   async function updateRoom(updatedData) {
     try {
+
+      if (updatedData.rounds !== undefined && socket !== undefined) {
+        socket.emit('update room settings', {rounds : updatedData.rounds});
+      }
+
+      if (updatedData.timer !== undefined && socket !== undefined) {
+        socket.emit('update room settings', {timer : updatedData.timer});
+      }
+
+
       await Axios.patch(`/room/${roomId}`, updatedData, {
         headers: {
           token: authenticationService.getToken()
@@ -211,7 +238,7 @@ function CreateLobbyView(props) {
                       <CustomizeView className='' initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} setIsGameStarted={setIsGameStarted}/> :
                       <div className="CreateLobbyView-waiting">
                         <h1>Waiting for game to start...</h1>
-                        <h2>{`# of rounds: ${initialRoomSettings.rounds} • Time each round: ${initialRoomSettings.timer}s`}</h2>
+                        <h2>{`# of rounds: ${rounds} • Time each round: ${timer}s`}</h2>
                       </div>)
               }
             </Grid>

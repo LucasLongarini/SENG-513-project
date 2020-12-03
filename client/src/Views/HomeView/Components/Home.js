@@ -74,7 +74,7 @@ const Home = (props) => {
           router.push(`/rooms/${response.data.room.id}`);
         }
         catch {
-           //TODO display error
+          toast.error("Error joining room");
         }  
     }
 
@@ -90,6 +90,21 @@ const Home = (props) => {
       catch {}
     }
 
+    async function handleAutoJoin() {
+      try {
+        const response = await Axios.get('/room/random', {
+          headers: {
+            token: authenticationService.getToken()
+          }
+        });
+
+        router.push(`/rooms/${response.data.roomId}`);
+      }
+      catch {
+        toast.error("No rooms found");
+      }
+    }
+
     return (
         <div className={classes.root}>
             <Grid className={classes.gridContainer} container spacing={3}>
@@ -101,7 +116,7 @@ const Home = (props) => {
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <Paper className={classes.paper, classes.userProfile}><UserProfile handleCreate={handleCreate}/></Paper>
+                    <Paper className={classes.paper, classes.userProfile}><UserProfile handleAutoJoin={handleAutoJoin} handleCreate={handleCreate}/></Paper>
                 </Grid>
             </Grid>
         </div>
