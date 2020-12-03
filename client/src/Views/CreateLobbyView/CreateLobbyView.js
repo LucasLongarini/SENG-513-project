@@ -219,6 +219,13 @@ function CreateLobbyView(props) {
     setUsers(newUsers);
   }
 
+  function newHost(hostId) {
+    setHostId(hostId);
+    if (hostId.toString() === authenticationService.getId() && !isHost) {
+      setIsHost(true);
+    }
+  }
+
   const createLobbyContent = () => (
     <div className={classes.root}>
       <Container className={classes.container} maxWidth='md'>
