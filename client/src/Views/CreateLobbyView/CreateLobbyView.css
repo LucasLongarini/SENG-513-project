@@ -1,29 +1,13 @@
-.CreateLobbyView-container {
-    display: flex;
-    flex-direction: row;
-    width: 800px; height: 500px;
-    align-content: center;
-    align-items: center;
-    margin: 8px;
-}
-
-.CreateLobbyView {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 .CreateLobbyView-waiting {
   background-color: white;
-  height: 100%;
+  height: auto;
   width: 100%;
+  min-height: 300px;
+  padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 20px;
-  padding: 0 20px;
   flex-direction: column;
   text-align: center;
 }
@@ -37,24 +21,8 @@
   font-size: 16px;
 }
 
-@media screen and (max-width: 800px) {
-    .CreateLobbyView-container {
-      width: 500px; height: 600px;
-      flex-direction: column-reverse;
-    }
-
-    .CreateLobbyView-waiting {
-      background-color: white;
-      height: 50%;
-      width: 100%;
-      margin: 0 0 20px 0;
-      padding: 0;
-    }
-}
-
-@media screen and (max-width: 500px) {
-    .CreateLobbyView-container {
-      width: 100%;
-      flex-direction: column-reverse;
-    }
+@media screen and (max-width: 960px) {
+  .CreateLobbyView-waiting {
+    height: 100%;
+  }
 }

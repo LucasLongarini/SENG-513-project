@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     width: '10%',
+    minWidth: '85px'
   }
 }));
 

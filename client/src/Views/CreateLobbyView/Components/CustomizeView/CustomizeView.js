@@ -5,7 +5,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import _ from "lodash";
 import { useHistory } from 'react-router-dom';
 
-// TODO handle user exit
 function CustomizeView(props) {
   const router = useHistory();
   const [isPrivate, setIsPrivate] = useState(props.initialRoomSettings.isPrivate);

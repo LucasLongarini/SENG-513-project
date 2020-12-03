@@ -57,7 +57,7 @@ const Lobbies = ({rooms, refresh}) => {
     return (
         <TableContainer className={classes.tableContainer} component={Paper}>
        <Scrollbars autoHide className={classes.scroll}>
-        { (rooms && rooms.length != 0) &&
+        { (rooms) &&
             <Table stickyHeader aria-label="lobby table">
             <TableHead>
                 <TableRow>
@@ -83,9 +83,6 @@ const Lobbies = ({rooms, refresh}) => {
                 ))}
             </TableBody>
             </Table>
-        }
-        { (rooms.length == 0) &&
-            'Maybe put some canvas element here when empty if time else just give em on these :('
         }
         </Scrollbars>
       </TableContainer>

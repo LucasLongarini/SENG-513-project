@@ -17,7 +17,7 @@ import io from 'socket.io-client';
 import {
   Paper,
   Grid,
-  Typography,
+  Container,
 } from '@material-ui/core';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -32,32 +32,31 @@ const useStyles = makeStyles((theme) => ({
     backgroundImage: `url(${Background})`,
     flexGrow: 1,
   },
+  header: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    height: 'auto',
+  },
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '90%',
+    minHeight: '600px',
+  },
   gridContainer: {
     width: '100%',
     height: '100%',
   },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-  lobbies: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    backgroundColor: theme.palette.grey[200],
-  },
-  userProfile: {
-    backgroundColor: theme.palette.grey[200],
-    padding: theme.spacing(3)
-  },
-  logo: {
-    width: '10%',
-  },
   customizeViewGridItem: {
+    display: 'flex',
     width: 'auto',
-    height: '100%',
-    maxHeight: '80vh',
-    maxWidth: '25vw !important',
+    height: '80%',
+    alignItems: 'center',
+    [theme.breakpoints.down('sm')]: {
+      height: 'auto',
+    }
   },
   gameHeader: {
     width: '100%',
@@ -204,31 +203,35 @@ function CreateLobbyView(props) {
 
   const createLobbyContent = () => (
     <div className={classes.root}>
-      <Grid className={classes.gridContainer} container spacing={3}>
+      <Container className={classes.container} maxWidth='md'>
+        <Grid className={classes.gridContainer} container spacing={3}>
+            <Grid item xs={12} className={classes.header}> 
               <DoodleHeader />
-          <Grid item xs={12} sm={3}></Grid> 
-          <ParticipantView xs={12} sm={4} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
-          <Grid item xs={12} sm={4} className ={classes.customizeViewGridItem}>
-          { isLoading ? 
-                <div className="CreateLobbyView-waiting">
-                    <h1>Loading...</h1>
-                </div> :
-                (isHost ?
-                  <CustomizeView className ={classes.customizeView} initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} setIsGameStarted={setIsGameStarted}/> :
-                  <div className="CreateLobbyView-waiting">
-                    <h1>Waiting for game to start...</h1>
-                    <h2>{`# of rounds: ${initialRoomSettings.rounds} • Time each round: ${initialRoomSettings.timer}s`}</h2>
-                  </div>)
+            </Grid>
+            <Grid item xs={12} md={4} className={classes.customizeViewGridItem}> 
+              <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+            </Grid>
+            <Grid item xs={12} md={8} className={classes.customizeViewGridItem}>
+              { isLoading ? 
+                    <div className="CreateLobbyView-waiting">
+                        <h1>Loading...</h1>
+                    </div> :
+                    (isHost ?
+                      <CustomizeView className='' initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} setIsGameStarted={setIsGameStarted}/> :
+                      <div className="CreateLobbyView-waiting">
+                        <h1>Waiting for game to start...</h1>
+                        <h2>{`# of rounds: ${initialRoomSettings.rounds} • Time each round: ${initialRoomSettings.timer}s`}</h2>
+                      </div>)
               }
-          </Grid>
-          <Grid item xs={12} sm={3}></Grid>
-      </Grid>
-      <CreateLobbyModal 
+            </Grid>
+        </Grid>
+      </Container>
+      {/* <CreateLobbyModal 
         isValidRoom={isValidRoom} 
         isHost={isHost} 
         isPrivateRoom={isPrivateRoom}
         validatePassword={validatePassword}
-      />
+      /> */}
       <InviteLinkModal isOpen={isInviteLinkOpen} setIsOpen={setIsInviteLinkOpen}/>
     </div>
   )
@@ -248,34 +251,8 @@ function CreateLobbyView(props) {
   }
 
   const renderViewContent = () => {
-    console.log(roomId)
     if (!isGameStarted) {
       return createLobbyContent();
-      // return (
-      //   <div className='CreateLobbyView' style={{ backgroundImage: `url(${Background})` }}>     
-      //     <div className='CreateLobbyView-container'>
-      //         <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
-      //         { isLoading ? 
-      //           <div className="CreateLobbyView-waiting">
-      //               <h1>Loading...</h1>
-      //           </div> :
-      //           (isHost ?
-      //             <CustomizeView initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} setIsGameStarted={setIsGameStarted}/> :
-      //             <div className="CreateLobbyView-waiting">
-      //               <h1>Waiting for game to start...</h1>
-      //               <h2>{`# of rounds: ${initialRoomSettings.rounds} • Time each round: ${initialRoomSettings.timer}s`}</h2>
-      //             </div>)
-      //         }
-      //     </div>        
-      //     <CreateLobbyModal 
-      //       isValidRoom={isValidRoom} 
-      //       isHost={isHost} 
-      //       isPrivateRoom={isPrivateRoom}
-      //       validatePassword={validatePassword}
-      //     />
-      //     <InviteLinkModal isOpen={isInviteLinkOpen} setIsOpen={setIsInviteLinkOpen}/>
-      //   </div>
-      // );
     }
     return (
       <GameView
