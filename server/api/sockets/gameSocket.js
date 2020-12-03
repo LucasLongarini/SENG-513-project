@@ -35,7 +35,27 @@ module.exports = async function(io) {
             userHasDisconnected(io, userId, roomId);
         });
 
+        socket.on('start game', () => {
+            startGame(io, userId, roomId);
+        });
+
     });
+}
+
+// starts a game and sets initial state
+async function startGame(io, userId, roomId) {
+    // TODO: set initial game state
+    try {
+        // check that the calling socket can actually start the game
+        let room = await Room.findOne({_id: roomId});
+
+        if (userId.toString() === room.HostId.toString()) {
+            io.to(roomId).emit('game start');
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
 }
 
 async function userHasDisconnected(io, userId, roomId) {

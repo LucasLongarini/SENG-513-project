@@ -138,6 +138,14 @@ function CreateLobbyView(props) {
     }
   }, [users, connected])
 
+  useEffect(() =>{
+    if (socket !== undefined) {
+      socket.on('game start', () => {
+        setIsGameStarted(true);
+      });
+    }
+  }, [connected]);
+
   useEffect(() => {
     if (socket !== undefined) {
       socket.on('new room settings', (data) => {
@@ -226,6 +234,13 @@ function CreateLobbyView(props) {
     }
   }
 
+  function startGame() {
+    console.log('start game');
+    if (isHost && socket !== undefined) {
+      socket.emit('start game');
+    }
+  }
+
   const createLobbyContent = () => (
     <div className={classes.root}>
       <Container className={classes.container} maxWidth='md'>
@@ -242,7 +257,7 @@ function CreateLobbyView(props) {
                         <h1>Loading...</h1>
                     </div> :
                     (isHost ?
-                      <CustomizeView className='' initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} setIsGameStarted={setIsGameStarted}/> :
+                      <CustomizeView className='' initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} startGame={startGame}/> :
                       <div className="CreateLobbyView-waiting">
                         <h1>Waiting for game to start...</h1>
                         <h2>{`# of rounds: ${rounds} • Time each round: ${timer}s`}</h2>
