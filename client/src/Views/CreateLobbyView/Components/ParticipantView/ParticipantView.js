@@ -2,9 +2,14 @@ import React from 'react';
 import './ParticipantView.css';
 import GroupIcon from '@material-ui/icons/Group';
 import JoinedUser from '../JoinedUser/JoinedUser';
-import { Button } from '@material-ui/core';
+import {
+  Paper,
+  Grid,
+  Typography,
+  Button,
+} from '@material-ui/core';
 
-function ParticipantView({handleInviteLink, users, hostId}) {
+function ParticipantView({handleInviteLink, users, hostId, xs, sm}) {
 
   function getJoinedUsers() {
     let userList = [];
@@ -21,24 +26,28 @@ function ParticipantView({handleInviteLink, users, hostId}) {
     return userList;
   }
 
-  return (
-    <div className='ParticipantView-container'>
-      <div className='joined-container'>
-        <GroupIcon/>
-        <h4>{`${users.length}/8`}</h4>
+  const renderContent = () => (
+    <Grid item xs={xs ? xs : 12} sm={sm ? sm : 12} className='ParticipantView-container'>
+      <div className='ParticipantView'>
+        <div className='joined-container'>
+          <GroupIcon/>
+          <h4>{`${users.length}/8`}</h4>
+        </div>
+        <div className='participant-grid'>
+          {getJoinedUsers()}
+        </div>
+        <Button variant="contained" disableElevation style={{
+          backgroundColor: "#CE5BF7",
+          borderRadius: 0,
+          color: "white"
+        }} onClick={handleInviteLink}>
+          Invite Link
+        </Button>
       </div>
-      <div className='participant-grid'>
-        {getJoinedUsers()}
-      </div>
-      <Button variant="contained" disableElevation style={{
-        backgroundColor: "#CE5BF7",
-        borderRadius: 0,
-        color: "white"
-      }} onClick={handleInviteLink}>
-        Invite Link
-      </Button>
-    </div>
-  );
+    </Grid>
+  )
+
+  return renderContent()
 }
 
 export default ParticipantView;

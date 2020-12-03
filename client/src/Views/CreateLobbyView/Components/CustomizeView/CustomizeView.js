@@ -5,7 +5,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import _ from "lodash";
 import { useHistory } from 'react-router-dom';
 
-// TODO handle user exit
 function CustomizeView(props) {
   const router = useHistory();
   const [isPrivate, setIsPrivate] = useState(props.initialRoomSettings.isPrivate);
@@ -116,7 +115,7 @@ function CustomizeView(props) {
 
       </div>
         
-      <Button variant="contained" color="secondary" 
+      <Button variant="contained" color="secondary" onClick={() => props.setIsGameStarted(true)}
         disableElevation style={{
           borderRadius: 0,
           color: "white"

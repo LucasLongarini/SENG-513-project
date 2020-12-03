@@ -14,10 +14,10 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
-    // backgroundImage: `url(${Background})`,
   },
   logo: {
     width: '10%',
+    minWidth: '85px'
   }
 }));
 
