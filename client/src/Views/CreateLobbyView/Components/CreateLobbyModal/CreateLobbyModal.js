@@ -7,7 +7,7 @@ import './CreateLobbyModal.css';
 
 Modal.setAppElement('#root');
 
-function CreateLobbyModal({isValidRoom, isPrivateRoom, isHost, validatePassword}) {
+function CreateLobbyModal({isValidRoom, isPrivateRoom, isHost, validatePassword, errorMessage}) {
 
   let showModal = !isValidRoom || (isPrivateRoom && !isHost);
   const router = useHistory();
@@ -48,7 +48,7 @@ function CreateLobbyModal({isValidRoom, isPrivateRoom, isHost, validatePassword}
 
         // if not, room doesn't exist
         <div className='CreateLobbyModal-error'>
-          <h1>This room does not exist</h1>
+          <h1>{errorMessage}</h1>
         </div>
       }
 

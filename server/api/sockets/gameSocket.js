@@ -2,6 +2,7 @@ const jwt = require ('jsonwebtoken');
 const mongoose = require('mongoose'); 
 const Room = require('../../models/Room');
 const User = require('../../models/User');
+const Game = require('../../models/Game');
 
 
 module.exports = function(io) {
@@ -27,11 +28,12 @@ module.exports = function(io) {
         socket.join(roomId);
 
         // emit user joined event to room
-        userHasConnected(io, userId, roomId);
-            //socket.emit('disconnect');
+        if (!await userHasConnected(io, userId, roomId)) 
+            socket.emit('force disconnect');
+        
 
-        //TODO check if there is a game in progress. If so, emit that data back to the socket
-
+        // if there is a game in progress, emit that data back to the socket
+        getGameState(socket, roomId);
 
         // Room settings updating event
         socket.on('update room settings', setting => {
@@ -53,6 +55,20 @@ module.exports = function(io) {
     });
 }
 
+// gets the initial game state, if any, and emits it back to the socket joining (for players joining mid game)
+//TODO send proper game data
+async function getGameState(socket, roomId) {
+
+    let game = await Game.findOne({RoomId: roomId});
+    console.log(game);
+    if (game) {
+        socket.emit('game in progress', {
+            round: game.Round,
+        });
+    }
+
+}
+
 // TODO check if word is correct;
 function newWord(io, socket, word, userId, roomId, userName) {
     io.to(roomId).emit('new word', {name: userName, word: word});
@@ -60,14 +76,29 @@ function newWord(io, socket, word, userId, roomId, userName) {
 
 // starts a game and sets initial state
 async function startGame(io, userId, roomId) {
-    // TODO: set initial game state
     try {
-        // check that the calling socket can actually start the game
+        // check that the calling user socket can actually start the game
         let room = await Room.findOne({_id: roomId});
 
-        if (userId.toString() === room.HostId.toString()) {
-            io.to(roomId).emit('game start');
-        }
+        if (userId.toString() !== room.HostId.toString())
+            return;
+        
+        
+        let newGame = new Game({
+            RoomId: roomId,
+            Round: 1,
+            Timer: room.Timer,
+            CurrentTurn: room.HostId,
+            RoundWord: "",
+            Players: room.UserIds.map((id) => {
+                return {
+                    _id: id,
+                }
+            })
+        });
+
+        await newGame.save();
+        io.to(roomId).emit('game start');
     }
     catch (err) {
         console.log(err);
@@ -82,11 +113,18 @@ async function userHasDisconnected(io, userId, roomId) {
             { $pull: { UserIds: userId } }
         );
 
+        // remove user from the game players if the game exists
+        await Game.updateOne(
+            { RoomId: roomId },
+            { $pull: { Players: {_id: userId} }},
+        );
+
         let room = await Room.findOne({_id: mongoose.Types.ObjectId(roomId)});
         
-        // if no more users, close the room
+        // if no more users, close the room & the game if it exists
         if (room.UserIds.length == 0){
             await Room.deleteOne({_id: mongoose.Types.ObjectId(roomId)});
+            await Game.deleteOne({RoomId: mongoose.Types.ObjectId(roomId)});
         }
 
         // if the user was the host, update the host to a new user (first in the array)
@@ -117,6 +155,7 @@ async function userHasConnected(io, userId, roomId) {
         if (room.UserIds.length >= 8) 
             return false;
         
+        
         // append the new user to the joined list if they are not already
         let newUser = await User.findOne({_id: mongoose.Types.ObjectId(userId)});
 
@@ -128,6 +167,17 @@ async function userHasConnected(io, userId, roomId) {
             );
         }
 
+        // append the new user to the game lsit if they are not already
+        let game = await Game.findOne({RoomId: mongoose.Types.ObjectId(roomId)});
+        if (game && !game.Players.find(i => i._id.toString() === userId.toString)) {
+            await Game.updateOne(
+                {RoomId: roomId},
+                {$push: {Players: {
+                    _id: userId,
+                }}}
+            );
+        }
+
         // send the user joined event to all sockets joined to the room except the sender
         io.to(roomId).emit('user connected', 
             {
@@ -136,9 +186,9 @@ async function userHasConnected(io, userId, roomId) {
                 emojiId: newUser.EmojiId,
             }
         );
+        return true;
     }
     catch (err) {
         console.log(err);
-        return false;
     }
 }

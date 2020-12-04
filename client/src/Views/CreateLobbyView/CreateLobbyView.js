@@ -80,6 +80,7 @@ function CreateLobbyView(props) {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [timer, setTimer] = useState("-");
   const [rounds, setRounds] = useState("-");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
 
@@ -107,6 +108,7 @@ function CreateLobbyView(props) {
       }
       catch {
         setIsValidRoom(false);
+        setErrorMessage("This room does not exist");
       }
       finally {
         setIsLoading(false)
@@ -136,14 +138,6 @@ function CreateLobbyView(props) {
       })
     }
   }, [users, connected])
-
-  useEffect(() =>{
-    if (socket !== undefined) {
-      socket.on('game start', () => {
-        setIsGameStarted(true);
-      });
-    }
-  }, [connected]);
 
   useEffect(() => {
     if (socket !== undefined) {
@@ -213,11 +207,25 @@ function CreateLobbyView(props) {
       }
     });
     setConnected(true);
+
+    socket.on('force disconnect', () => {
+      disconnect();
+    });
+    socket.on('game in progress', (game) => {
+      goToGame();
+    });
+    socket.on('game start', () => {
+      setIsGameStarted(true);
+    });
+  }
+
+  function goToGame() {
+    setIsGameStarted(true);
   }
 
   function userConnected(user) {
     if (!users.find(i => i.id === user.id)) {
-      setUsers([...users, user]);
+      setUsers(oldUsers => [...oldUsers, user]);
     }
   }
 
@@ -234,10 +242,16 @@ function CreateLobbyView(props) {
   }
 
   function startGame() {
-    console.log('start game');
     if (isHost && socket !== undefined) {
       socket.emit('start game');
     }
+  }
+
+  function disconnect() {
+    console.log('disconnected');
+    socket.disconnect();
+    setErrorMessage("The room is full");
+    setIsValidRoom(false);
   }
 
   const createLobbyContent = () => (
@@ -267,6 +281,7 @@ function CreateLobbyView(props) {
       </Container>
       <CreateLobbyModal 
         isValidRoom={isValidRoom} 
+        errorMessage={errorMessage}
         isHost={isHost} 
         isPrivateRoom={isPrivateRoom}
         validatePassword={validatePassword}
@@ -301,6 +316,7 @@ function CreateLobbyView(props) {
         </Grid>
         <CreateLobbyModal 
           isValidRoom={isValidRoom} 
+          errorMessage={errorMessage}
           isHost={isHost} 
           isPrivateRoom={isPrivateRoom}
           validatePassword={validatePassword}
@@ -310,11 +326,7 @@ function CreateLobbyView(props) {
     )
   }
 
-  
-
-  return (
-    renderViewContent()
-  );
+  return renderViewContent();
 }
 
 export default CreateLobbyView;
