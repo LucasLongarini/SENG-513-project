@@ -10,23 +10,20 @@ toast.configure();
 const useStyles = makeStyles((theme) => ({
     gameBoard: {
         position: 'relative',
-        top: '1vh',
         width: '100%',
-        height: '65vh',
+        margin: '20px 0 40px 0',
+        flex: '1',
     },
     gameBoardCanvas: {
         backgroundColor: 'white',
-        borderRadius: '5px 5px 0 0',
-        boxShadow: '15px 15px 0 0 rgba(0,0,0,.2)',
+        borderRadius: '5px',
+        boxShadow: '15px 15px 0 0 rgba(0,0,0, .2)',
         userSelect: 'none',
         '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
         '-webkitUserDrag': 'none',
         cursor: 'none',
-        position: 'relative',
-        top: 0,
-        left: 0,
         width: '100%',
-        height: '100%',
+        // height: '100%',
     },
     gameBoardPen: {
         backgroundImage: 'url(https://maps.gstatic.com/mapfiles/santatracker/v201912242254/scenes/speedsketch/img/pen.svg);',

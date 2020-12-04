@@ -45,7 +45,7 @@ module.exports = function(io) {
         });
 
         socket.on('start game', () => {
-            startGame(io, userId, roomId);
+            startGame(io, socket, userId, roomId);
         });
 
         socket.on('send word', word => {
@@ -74,7 +74,7 @@ function newWord(io, socket, word, userId, roomId, userName) {
 }
 
 // starts a game and sets initial state
-async function startGame(io, userId, roomId) {
+async function startGame(io, socket, userId, roomId) {
     try {
         // check that the calling user socket can actually start the game
         let room = await Room.findOne({_id: roomId});
@@ -98,6 +98,13 @@ async function startGame(io, userId, roomId) {
 
         await newGame.save();
         io.to(roomId).emit('game start');
+
+        // start turn for the host
+        setTimeout(() => {
+            socket.emit('start turn', {
+
+            });
+        }, 500);
     }
     catch (err) {
         console.log(err);

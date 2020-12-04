@@ -6,7 +6,7 @@ import Chat from '../Components/ChatView/ChatContainer';
 import {
     Paper,
     Grid,
-    Typography,
+    Button,
 } from '@material-ui/core';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -49,15 +49,40 @@ const useStyles = makeStyles((theme) => ({
     gridItem: {
         height: '100%',
     },
+    gridItemGame: {
+        display: 'flex',
+        height: '100%',
+        flexDirection: 'column',
+    },
     gameHeader: {
         width: '100%',
-        height: '5vh',
         textAlign: 'center',
         verticalAlign: 'center',
     },
     gameHeaderPaper: {
+        width: 'auto',
+        margin: 'auto',
+        padding: '20px',
+    },
+    wordPicker: {
+        position: 'absolute',
+        top: '20px',
+        left: '0',
+        bottom: '40px',
         width: '100%',
-        margin: 'auto'
+        borderRadius: '5px',
+        background: ' rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        color: 'white',
+    },
+    wordGrid: {
+        marginTop: '10px',
+        display: 'grid',
+        gridGap: '8px',
+        gridTemplateColumns: '1fr 1fr 1fr'
     }
 }));
 
@@ -95,7 +120,7 @@ const Game = (props) => {
         <div className={classes.root} >
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
             <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
-                <Grid item spacing={3} xs={10}>
+                <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
                             <Grid container className={classes.gameHeader}>
@@ -107,6 +132,14 @@ const Game = (props) => {
                     </div>
                     <div className={classes.game} >
                         <GameBoard socketRef={socket} />
+                        <div className={classes.wordPicker}>
+                            <h1>Choose a word:</h1>
+                            <div className={classes.wordGrid}>
+                                <Button variant="contained">Word 1</Button>
+                                <Button variant="contained">Word 2</Button>
+                                <Button variant="contained">Word 3</Button>
+                            </div>
+                        </div>
                     </div>
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2}>
