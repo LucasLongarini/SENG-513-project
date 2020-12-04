@@ -1,4 +1,4 @@
-import { React, useRef } from 'react';
+import { React, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import GameBoard from './GameBoard.js'
@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
+    gridItem: {
+        height: '100%',
+    },
     gameHeader: {
         width: '100%',
         height: '5vh',
@@ -60,31 +63,32 @@ const useStyles = makeStyles((theme) => ({
 
 const Game = (props) => {
     const {
-        initialRoomSettings,
-        roomId,
-        socketRef,
+        socket,
     } = props;
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
     const router = useHistory();
+    const [words, setWords] = useState([]);
+
+    useEffect(() => {
+        if (socket !== undefined) {
+            socket.on('new word', handleNewWord);
+        }
+    }, []);
+
+    function handleNewWord(data) {
+        let newWord = {name: data.name, word: data.word};
+        setWords(oldWords => [...oldWords, newWord]);
+    }
 
     const onPenMove = (e) => {
         gameBoardPenRef.current.style.left = `${e.pageX}px`;
         gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
     }
 
-    const renderGameHeaderContent = () => {
-        return (
-          <div >
-            <Paper className={classes.gameHeaderPaper}>
-              <Grid container className={classes.gameHeader}>
-                  <Grid item xs={1} sm={3}>Time</Grid>
-                  <Grid item xs={1} sm={3}>Round</Grid>
-                  <Grid item xs={1} sm={6}>{`S _ _ E _   M _ N`}</Grid>
-              </Grid>
-            </Paper>
-          </div>
-        )
+    function handleSendWord(word) {
+        if (word !== undefined && word.length > 0)
+            socket.emit('send word', word);
     }
 
     return (
@@ -92,13 +96,21 @@ const Game = (props) => {
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
             <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
                 <Grid item spacing={3} xs={10}>
-                    {renderGameHeaderContent()}
+                    <div >
+                        <Paper className={classes.gameHeaderPaper}>
+                            <Grid container className={classes.gameHeader}>
+                                <Grid item xs={1} sm={3}>Round</Grid>
+                                <Grid item xs={1} sm={6}>{`S _ _ E _   M _ N`}</Grid>
+                                <Grid item xs={1} sm={3}>Time</Grid>
+                            </Grid>
+                        </Paper>
+                    </div>
                     <div className={classes.game} >
-                        <GameBoard socketRef={socketRef} />
+                        <GameBoard socketRef={socket} />
                     </div>
                 </Grid>
-                <Grid item xs={2}>
-                    <Chat/>
+                <Grid className={classes.gridItem} item xs={2}>
+                    <Chat words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>
         </div>

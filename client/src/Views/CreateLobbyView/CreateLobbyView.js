@@ -52,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     width: 'auto',
     height: '80%',
-    background: 'red',
     alignItems: 'center',
     [theme.breakpoints.down('sm')]: {
       height: 'auto',
@@ -295,17 +294,17 @@ function CreateLobbyView(props) {
                   participants={<ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>}
                   initialRoomSettings={initialRoomSettings} 
                   roomId={roomId}
-                  socketRef={socket}
+                  socket={socket}
                 />
               }
             </Grid>
         </Grid>
-        {/* <CreateLobbyModal 
+        <CreateLobbyModal 
           isValidRoom={isValidRoom} 
           isHost={isHost} 
           isPrivateRoom={isPrivateRoom}
           validatePassword={validatePassword}
-        /> */}
+        />
         <InviteLinkModal isOpen={isInviteLinkOpen} setIsOpen={setIsInviteLinkOpen}/>
       </div>
     )

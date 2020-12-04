@@ -4,14 +4,21 @@ const Room = require('../../models/Room');
 const User = require('../../models/User');
 
 
-module.exports = async function(io) {
-    io.on('connection', (socket) => {
+module.exports = function(io) {
+    io.on('connection', async (socket) => {
         let userId;
         let roomId;
+        let userName;
         try{
             const decoded = jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET);
             userId = decoded.id;
             roomId = socket.handshake.query.roomId;
+            let user = await User.findById(mongoose.Types.ObjectId(userId.toString()));
+
+            if (user === undefined || user === null)
+                return socket.emit('disconnect');
+            else
+                userName = user.Name;
         }
         catch {
             return socket.emit('disconnect');
@@ -39,7 +46,16 @@ module.exports = async function(io) {
             startGame(io, userId, roomId);
         });
 
+        socket.on('send word', word => {
+            newWord(io, socket, word, userId, roomId, userName);
+        });
+
     });
+}
+
+// TODO check if word is correct;
+function newWord(io, socket, word, userId, roomId, userName) {
+    io.to(roomId).emit('new word', {name: userName, word: word});
 }
 
 // starts a game and sets initial state
