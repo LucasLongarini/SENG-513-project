@@ -31,7 +31,7 @@ function AuthenticationView(props) {
   }
 
   function handleRedirect() {
-    if (props.location) {
+    if (props.location && props.location.state && props.location.from) {
       router.push(props.location.state.from.pathname);
     }
     else{

@@ -60,7 +60,6 @@ module.exports = function(io) {
 async function getGameState(socket, roomId) {
 
     let game = await Game.findOne({RoomId: roomId});
-    console.log(game);
     if (game) {
         socket.emit('game in progress', {
             round: game.Round,

@@ -4,11 +4,11 @@
 }
 
 body {
-  /* font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif; */
+    sans-serif;
     /* font-family: 'Sedgwick Ave', cursive !important; school bell */
-  font-family: 'Schoolbell' !important;
+  /* font-family: 'Schoolbell' !important; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

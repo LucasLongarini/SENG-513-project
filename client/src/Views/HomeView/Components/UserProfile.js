@@ -36,9 +36,16 @@ const useStyles = makeStyles((theme) => ({
       height: '100%',
       width: '100%',
   },
+  logoutGrid: {
+      display: 'flex',
+      justifyContent: 'flex-end',
+  },
+  logoutButton: {
+      fontSize: '1rem',
+  }
 }));
 
-const UserProfile = ({ handleCreate, handleAutoJoin }) => {
+const UserProfile = ({ handleCreate, handleAutoJoin, handleLogout }) => {
     const classes = useStyles();
 
     const [isGuest, setisGuest] = useState(false);
@@ -54,6 +61,9 @@ const UserProfile = ({ handleCreate, handleAutoJoin }) => {
     return (
         <div className={classes.root}>
             <Grid className={classes.gridContainer} container spacing={3}>
+                <Grid className={classes.logoutGrid} item xs={12}>
+                    <Button className={classes.logoutButton} color="secondary" onClick={handleLogout}>Logout</Button>
+                </Grid>
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <div>
@@ -63,11 +73,11 @@ const UserProfile = ({ handleCreate, handleAutoJoin }) => {
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                    <Paper className={classes.paper}><Button onClick={handleAutoJoin} size="large" fullWidth variant="contained" color="secondary">QUICK JOIN</Button></Paper>
+                    <Button onClick={handleAutoJoin} size="large" fullWidth variant="contained" color="secondary">QUICK JOIN</Button>
                 </Grid>
                 { !isGuest &&
                 <Grid item xs={12} sm={12}>
-                    <Paper className={classes.paper}><Button onClick={handleCreate} size="large" fullWidth variant="contained" color="secondary">CREAT LOBBY</Button></Paper>
+                    <Button onClick={handleCreate} size="large" fullWidth variant="contained" color="secondary">CREAT LOBBY</Button>
                 </Grid>
                 }
             </Grid>

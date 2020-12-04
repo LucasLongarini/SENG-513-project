@@ -39,6 +39,7 @@ function LoginView(props) {
       props.handleRedirect();     
     }
     catch (error) {
+      console.log(error);
       toast.error("Authentication error");
     }
   }

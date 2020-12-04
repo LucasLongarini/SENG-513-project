@@ -64,6 +64,11 @@ const Home = (props) => {
         return `${rooms.length ? 'We found some games that you could join!' : 'No one is playing right now :( Start a game and invite your friends!'}`
     }
 
+    function handleLogout() {
+      authenticationService.logout();
+      router.push('/login');
+    }
+
     async function handleCreate() {
         try {
           const response = await Axios.post('/room/create', {}, {
@@ -116,7 +121,7 @@ const Home = (props) => {
                     </Paper>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <Paper className={classes.paper, classes.userProfile}><UserProfile handleAutoJoin={handleAutoJoin} handleCreate={handleCreate}/></Paper>
+                    <Paper className={classes.paper, classes.userProfile}><UserProfile handleLogout={handleLogout} handleAutoJoin={handleAutoJoin} handleCreate={handleCreate}/></Paper>
                 </Grid>
             </Grid>
         </div>

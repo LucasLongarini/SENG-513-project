@@ -9,7 +9,6 @@ const idName = 'id';
 
 const AuthenticationService = {
 
-    // Token methods
     isAuthenticated() {
         return localStorage.getItem(tokenName);    
     },
@@ -39,6 +38,15 @@ const AuthenticationService = {
         return promise;
     },
 
+    logout: function() {
+        this.deleteToken();
+        this.deleteDisplayName();
+        this.deleteEmojiId();
+        this.deleteIsGuest();
+        this.deleteId();
+    },
+
+    // Token methods
     saveToken(token){
         localStorage.setItem(tokenName, token);
     },

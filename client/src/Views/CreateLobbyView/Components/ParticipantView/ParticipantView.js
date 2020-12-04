@@ -3,9 +3,7 @@ import './ParticipantView.css';
 import GroupIcon from '@material-ui/icons/Group';
 import JoinedUser from '../JoinedUser/JoinedUser';
 import {
-  Paper,
   Grid,
-  Typography,
   Button,
 } from '@material-ui/core';
 
@@ -14,14 +12,14 @@ function ParticipantView({handleInviteLink, users, hostId, xs, sm}) {
   function getJoinedUsers() {
     let userList = [];
     if (users !== undefined) {
-      userList = users.map(user => {
+      userList = users.map((user, index) => {
         let isHost = user.id == hostId;
-        return <JoinedUser isVisible={true} isHost={isHost} emojiId={user.emojiId} name={user.name}/>
+        return <JoinedUser key={index} isVisible={true} isHost={isHost} emojiId={user.emojiId} name={user.name}/>
       });
     }
 
-    for (let i=0; i < (8-users.length); i++) {
-      userList.push(<JoinedUser isVisible={false}/>);
+    for (let i=users.length; i < 8; i++) {
+      userList.push(<JoinedUser key={i} isVisible={false}/>);
     }
     return userList;
   }
