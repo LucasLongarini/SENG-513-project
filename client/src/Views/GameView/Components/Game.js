@@ -83,7 +83,13 @@ const useStyles = makeStyles((theme) => ({
         display: 'grid',
         gridGap: '8px',
         gridTemplateColumns: '1fr 1fr 1fr'
-    }
+    },
+    wordHint: {
+        whiteSpace: 'break-spaces'
+    },
+    headerItems: {
+        margin: 'auto',
+    },
 }));
 
 const Game = (props) => {
@@ -94,15 +100,39 @@ const Game = (props) => {
     const classes = useStyles();
     const router = useHistory();
     const [words, setWords] = useState([]);
+    const [chooseWords, setChooseWords] = useState([]);
+    const [turnStarted, setTurnStarted] = useState(false);
+    const [isYourTurn, setIsYourTurn] = useState(false);
+    const [timer, setTimer] = useState(0);
+    const [round, setRound] = useState(1);
+    const [wordHint, setWordHint] = useState("");
 
     useEffect(() => {
         if (socket !== undefined) {
-            socket.on('new word', handleNewWord);
+            socket.on('new guess', handleNewGuess);
+
+            // your turn has started
+            socket.on('start your turn', words => {
+                setIsYourTurn(true);
+                setChooseWords(words);
+            });
+
+            // a new players turn started
+            socket.on('turn started', (data) => {
+                setRound(data.round);
+                setWordHint(data.wordHint);
+                setTurnStarted(true);
+            });
+
+            // timer updates
+            socket.on('timer', time => {
+                setTimer(time);
+            });
         }
     }, []);
 
-    function handleNewWord(data) {
-        let newWord = {name: data.name, word: data.word};
+    function handleNewGuess(data) {
+        let newWord = {name: data.name, word: data.word, isCorrect: data.isCorrect};
         setWords(oldWords => [...oldWords, newWord]);
     }
 
@@ -116,6 +146,15 @@ const Game = (props) => {
             socket.emit('send word', word);
     }
 
+    function handleWordSelection(word, difficulty) {
+        socket.emit('word selected', {
+            word: word,
+            difficulty: difficulty
+        });
+        setWordHint(word);
+        setChooseWords([]);
+    }
+
     return (
         <div className={classes.root} >
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
@@ -124,22 +163,25 @@ const Game = (props) => {
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
                             <Grid container className={classes.gameHeader}>
-                                <Grid item xs={1} sm={3}>Round</Grid>
-                                <Grid item xs={1} sm={6}>{`S _ _ E _   M _ N`}</Grid>
-                                <Grid item xs={1} sm={3}>Time</Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Round: ${round}`}</Grid>
+                                <Grid item xs={1} sm={6}>
+                                    <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
+                                </Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Time: ${timer}s`}</Grid>
                             </Grid>
                         </Paper>
                     </div>
                     <div className={classes.game} >
                         <GameBoard socketRef={socket} />
-                        <div className={classes.wordPicker}>
-                            <h1>Choose a word:</h1>
-                            <div className={classes.wordGrid}>
-                                <Button variant="contained">Word 1</Button>
-                                <Button variant="contained">Word 2</Button>
-                                <Button variant="contained">Word 3</Button>
-                            </div>
-                        </div>
+                        {!turnStarted && <div className={classes.wordPicker}>
+                            <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word"}</h1>
+                            { isYourTurn && <div className={classes.wordGrid}>
+                                {chooseWords && chooseWords.map((word, index) => {
+                                    return <Button key={index} onClick={() => handleWordSelection(word.word, word.difficulty)} 
+                                        variant="contained">{word.word}</Button>
+                                })}
+                            </div>}
+                        </div>}
                     </div>
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2}>

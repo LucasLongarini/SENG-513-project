@@ -2,12 +2,21 @@ const mongoose = require('mongoose');
 
 const GameSchema = mongoose.Schema({
     RoomId: mongoose.ObjectId,
-    Round: Number,
+    CurrentRound: {
+        type: Number,
+        default: 1,
+    },
+    TotalRounds: Number,
     Timer: Number,
     CurrentTurn: mongoose.ObjectId,
     RoundWord: String,
+    RoundWordDifficulty: {
+        type: Number,
+        default: 1
+    },
     Players: [{
         Id: mongoose.ObjectId,
+        SocketId: String,
         HasCompletedTurn: {
             type: Boolean,
             default: false

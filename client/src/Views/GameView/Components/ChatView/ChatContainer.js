@@ -5,7 +5,6 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ChatMessage from './ChatMessage';
-import { v4 as uuidv4 } from 'uuid';
 
 const useStyles = makeStyles((theme) => ({
       chatContainer: {
@@ -46,7 +45,7 @@ function ChatContainer({onNewWord, words}) {
     <Paper className={classes.chatContainer}>
         <div className={classes.chatOutputContainer}>
           { words !== undefined && 
-            words.map((word, index) => <ChatMessage key={index} name={word.name} text={word.word}/>)
+            words.map((word, index) => <ChatMessage key={index} isCorrect={word.isCorrect} name={word.name} text={word.word}/>)
           }
         </div>
         <div className={classes.chatInputContainer}>

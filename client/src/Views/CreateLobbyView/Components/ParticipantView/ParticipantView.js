@@ -7,25 +7,44 @@ import {
   Button,
 } from '@material-ui/core';
 
-function ParticipantView({handleInviteLink, users, hostId, xs, sm}) {
+function ParticipantView({handleInviteLink, users, hostId, drawingUserId, correctUserIds}) {
 
   function getJoinedUsers() {
     let userList = [];
     if (users !== undefined) {
-      userList = users.map((user, index) => {
-        let isHost = user.id == hostId;
-        return <JoinedUser key={index} isVisible={true} isHost={isHost} emojiId={user.emojiId} name={user.name}/>
-      });
+
+      for (let i = 0; i < users.length; i++) {
+        let user = users[i];
+
+        //only add unique users
+        if (userList.find(i => i.id === user.id))
+          continue;
+
+        let isHost = user.id === hostId;
+        let isDrawing = user.id === drawingUserId;
+        let isCorrect = false;
+        if (correctUserIds && correctUserIds.find(i => i === user.id))
+          isCorrect = true;
+
+        userList.push(<JoinedUser 
+          isCorrect={isCorrect} 
+          isDrawing={isDrawing} 
+          key={i} 
+          isVisible={true} 
+          isHost={isHost} 
+          emojiId={user.emojiId} 
+          name={user.name}/>);
+      }
     }
 
-    for (let i=users.length; i < 8; i++) {
+    for (let i=userList.length; i < 8; i++) {
       userList.push(<JoinedUser key={i} isVisible={false}/>);
     }
     return userList;
   }
 
   const renderContent = () => (
-    <Grid item xs={xs ? xs : 12} sm={sm ? sm : 12} className='ParticipantView-container'>
+    <Grid item xs={12} className='ParticipantView-container'>
       <div className='ParticipantView'>
         <div className='joined-container'>
           <GroupIcon/>
