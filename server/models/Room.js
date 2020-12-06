@@ -26,7 +26,10 @@ const RoomSchema = mongoose.Schema({
         required: true
     },
     UserIds: {
-        type: [mongoose.ObjectId],
+        type: [{
+            _id: mongoose.ObjectId,
+            SocketId: String,
+        }],
         required: false
     }
 });

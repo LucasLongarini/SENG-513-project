@@ -30,7 +30,7 @@ module.exports = function(io) {
         socket.join(roomId);
 
         // emit user joined event to room
-        if (!await userHasConnected(io, userId, roomId)) 
+        if (!await userHasConnected(io, socket, userId, roomId)) 
             socket.emit('force disconnect');
         
 
@@ -94,7 +94,7 @@ async function newWord(io, socket, word, userId, roomId, userName) {
         // check if all players have guessed corretly
         let game = await Game.findOne({RoomId: roomId});
         if (game !== null && !game.Players.find(i => !i.HasGuessedCorrectly)) {
-            endTurn(roomId);
+            endTurn(io, roomId, game);
         }
 
 
@@ -122,10 +122,10 @@ async function startGame(io, socket, userId, roomId) {
             CurrentTurn: room.HostId,
             RoundWord: "",
             RoundWordDifficulty: 1,
-            Players: room.UserIds.map((id) => {
+            Players: room.UserIds.map((i) => {
                 return {
-                    _id: id,
-                    SocketId: socket.id
+                    _id: i._id,
+                    SocketId: i.SocketId
                 }
             })
         });
@@ -133,7 +133,7 @@ async function startGame(io, socket, userId, roomId) {
         await newGame.save();
         io.to(roomId).emit('game start');
 
-        switchTurns(io, socket, userId, roomId);
+        switchTurns(io, socket.id, userId, roomId);
 
     }
     catch (err) {
@@ -142,8 +142,8 @@ async function startGame(io, socket, userId, roomId) {
 }
 
 // sends events to the socket whos turn it is and asks them to pick a word
-function switchTurns(io, socket, userId, roomId) {
-    io.to(socket.id).emit('start your turn', wordGenerator.generateWords());
+function switchTurns(io, socketId, userId, roomId) {
+    io.to(socketId).emit('start your turn', wordGenerator.generateWords());
     io.to(roomId).emit('switch turns', {
         userId: userId
     });
@@ -152,61 +152,103 @@ function switchTurns(io, socket, userId, roomId) {
 // starts the turn of the current socket
 async function startTurn(io, socket, userId, roomId, data) {
 
-    let game = await Game.findOne({RoomId: roomId});
+    try {
+    
+        let game = await Game.findOne({RoomId: roomId});
 
-    if (game === null)
-        return;
+        if (game === null)
+            return;
 
-    // update current word turn, current player going
-    await Game.updateOne({RoomId: roomId}, { 
-        RoundWord: data.word.toLowerCase(),
-        RoundWordDifficulty: data.difficulty,
-        CurrentTurn: mongoose.Types.ObjectId(userId)
-    });
+        // update current word turn, current player going
+        await Game.updateOne({RoomId: roomId}, { 
+            RoundWord: data.word.toLowerCase(),
+            RoundWordDifficulty: data.difficulty,
+            CurrentTurn: mongoose.Types.ObjectId(userId)
+        });
 
-    // mark the player as 'HasCompletedTurn' & 'HasGuessedCorrectly'
-    await Game.updateOne({ 'Players._id': mongoose.Types.ObjectId(userId)},
-        {
-            $set: 
+        // mark the player as 'HasCompletedTurn' & 'HasGuessedCorrectly'
+        await Game.updateOne({ 'Players._id': mongoose.Types.ObjectId(userId)},
             {
-                'Players.$.HasCompletedTurn': true,
-                'Players.$.HasGuessedCorrectly': true
+                $set: 
+                {
+                    'Players.$.HasCompletedTurn': true,
+                    'Players.$.HasGuessedCorrectly': true
+                }
+            } ,
+        );
+
+        // broadcast to all sockets the a turn is starting
+        socket.broadcast.to(roomId).emit('turn started', {
+            round: game.CurrentRound,
+            wordHint:  wordGenerator.convertWordToHint(data.word),
+        });
+        io.to(socket.id).emit('turn started', {
+            round: game.CurrentRound,
+            wordHint: data.word,
+        });
+
+        // create a timer socket for the time
+        let timer = game.Timer;
+        let timerInterval = setInterval(() => {
+            io.to(roomId).emit('timer', timer);
+            if (timer === 0) {
+                // TODO: end turn
+                clearInterval(timerInterval);
             }
-        } ,
-    );
+            timer--;
+        }, 1000);
 
-    // broadcast to all sockets the a turn is starting
-    socket.broadcast.to(roomId).emit('turn started', {
-        round: game.CurrentRound,
-        wordHint:  wordGenerator.convertWordToHint(data.word),
-    });
-    io.to(socket.id).emit('turn started', {
-        round: game.CurrentRound,
-        wordHint: data.word,
-    });
-
-    // create a timer socket for the time
-    let timer = game.Timer;
-    let timerInterval = setInterval(() => {
-        io.to(roomId).emit('timer', timer);
-        if (timer === 0) {
-            // TODO: end turn
-            clearInterval(timerInterval);
-        }
-        timer--;
-    }, 1000);
-
-    // set here so it can be cleared elsewere is needed.
-    Timers[roomId] = timerInterval;
+        // set here so it can be cleared elsewere is needed.
+        Timers[roomId] = timerInterval;
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
 
 // Ends the current turn. Checks if the round is over (all players have drawn).
 // If so, end the round.
-async function endTurn(roomId) {
-    let timer = Timers[roomId];
-    clearInterval(timer);
-    delete Timers[roomId];
-    console.log(Timers);
+async function endTurn(io, roomId, game) {
+
+    try {
+        // clear interval
+        let timer = Timers[roomId];
+        clearInterval(timer);
+        delete Timers[roomId];
+
+        io.to(roomId).emit('turn end', {
+            word: game.RoundWord
+        });
+
+        // check if the round is over (all players have HasCompletedTurn)
+        if (!game.Players.find(i => !i.HasCompletedTurn)) {
+            // TODO: handle round over.
+        }
+
+        let nextPlayerId;
+        let nextPlayerSocketId;
+        let nextPlayerChosen = false;
+        //reset all players 'HasGuessedCorrectly' and update next player
+        for (let player of game.Players) {
+            player.HasGuessedCorrectly = false;
+            if (!player.HasCompletedTurn && !nextPlayerChosen) {
+                nextPlayerId = player._id;
+                nextPlayerSocketId = player.SocketId;
+                game.CurrentTurn = nextPlayerId;
+                nextPlayerChosen = true;
+            }
+        }
+        await game.save();
+
+        setTimeout(() => {
+            switchTurns(io, nextPlayerSocketId, nextPlayerId, roomId);
+        }, 5000);
+        //in 5 seconds, start turn for the next player
+
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
 
 // Connection Methods
@@ -216,7 +258,7 @@ async function userHasDisconnected(io, userId, roomId) {
         // remove user from the userIDs
         await Room.updateOne(
             { _id: roomId },
-            { $pull: { UserIds: userId } }
+            { $pull: { UserIds: {_id: userId} } }
         );
 
         // remove user from the game players if the game exists
@@ -236,7 +278,7 @@ async function userHasDisconnected(io, userId, roomId) {
         // if the user was the host, update the host to a new user (first in the array)
         else if (userId.toString() === room.HostId.toString()) {
             // in this state, there will always be at least 1 user in UserIds, we will take the first user and make them the new host
-            let newHostId = room.UserIds[0];
+            let newHostId = room.UserIds[0]._id;
             await Room.updateOne(
                 { _id: roomId },
                 { HostId: newHostId}
@@ -254,7 +296,7 @@ async function userHasDisconnected(io, userId, roomId) {
     }
 }
 
-async function userHasConnected(io, userId, roomId) {
+async function userHasConnected(io, socket, userId, roomId) {
     try {
         //check if room is full. If so, disconnect socket.
         let room = await Room.findOne({_id: mongoose.Types.ObjectId(roomId)});
@@ -269,7 +311,10 @@ async function userHasConnected(io, userId, roomId) {
         {
             await Room.updateOne(
                 { _id: roomId },
-                { $push: {UserIds: userId} }
+                { $push: {UserIds: {
+                    _id: mongoose.Types.ObjectId(userId), 
+                    SocketId: socket.id
+                }}}
             );
 
             // send the user joined event to all sockets joined to the room except the sender
@@ -282,13 +327,14 @@ async function userHasConnected(io, userId, roomId) {
             );
         }
 
-        // append the new user to the game lsit if they are not already
+        // append the new user to the game list if they are not already
         let game = await Game.findOne({RoomId: mongoose.Types.ObjectId(roomId)});
         if (game && !game.Players.find(i => i._id.toString() === userId.toString)) {
             await Game.updateOne(
                 {RoomId: roomId},
                 {$push: {Players: {
                     _id: userId,
+                    SocketId: socket.id,
                 }}}
             );
         }

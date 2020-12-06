@@ -58,7 +58,7 @@ const Home = (props) => {
 
     useEffect(() => {
       getAllRooms();
-    })
+    }, []);
 
     const getLoobbiesTableHeader = () => {
         return `${rooms.length ? 'We found some games that you could join!' : 'No one is playing right now :( Start a game and invite your friends!'}`

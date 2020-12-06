@@ -213,6 +213,9 @@ function CreateLobbyView(props) {
         setRounds(data.rounds);
       }
     });
+    socket.on('turn started', () => {
+      setCorrectUserIds([]);
+    });
   }
 
   function goToGame() {

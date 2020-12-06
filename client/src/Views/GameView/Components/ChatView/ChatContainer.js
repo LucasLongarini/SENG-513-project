@@ -27,9 +27,15 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1.5),
         height: 'auto',
       },
+      chatHeader: {
+        margin: 'auto',
+        padding: '10px 0 5px 0',
+        fontWeight: '400',
+        fontSize: '20px'
+      }
   }));
 
-function ChatContainer({onNewWord, words}) {
+function ChatContainer({onNewWord, words, isYourTurn}) {
 
   const [word, setWord] = useState("");
   const classes = useStyles();
@@ -43,16 +49,17 @@ function ChatContainer({onNewWord, words}) {
 
   return (
     <Paper className={classes.chatContainer}>
+        <h2 className={classes.chatHeader}>Guesses</h2>
         <div className={classes.chatOutputContainer}>
           { words !== undefined && 
             words.map((word, index) => <ChatMessage key={index} isCorrect={word.isCorrect} name={word.name} text={word.word}/>)
           }
         </div>
         <div className={classes.chatInputContainer}>
-          <TextField value={word} onKeyDown={handleKeyPressed} 
+          { !isYourTurn && <TextField value={word} onKeyDown={handleKeyPressed} 
             onChange={v => setWord(v.target.value)}
             size='small' variant='filled' 
-            fullWidth label="Type your guess..." />
+            fullWidth label="Type your guess..." />}
         </div>
     </Paper>
   );

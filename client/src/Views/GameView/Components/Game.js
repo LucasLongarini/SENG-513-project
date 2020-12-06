@@ -10,6 +10,7 @@ import {
 } from '@material-ui/core';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import authenticationService from '../../../services/AuthenticationService';
 
 toast.configure();
 
@@ -103,6 +104,8 @@ const Game = (props) => {
     const [chooseWords, setChooseWords] = useState([]);
     const [turnStarted, setTurnStarted] = useState(false);
     const [isYourTurn, setIsYourTurn] = useState(false);
+    const [turnEnded, setTurnEnded] = useState(false);
+    const [correctWord, setCorrectWord] = useState("");
     const [timer, setTimer] = useState(0);
     const [round, setRound] = useState(1);
     const [wordHint, setWordHint] = useState("");
@@ -113,20 +116,41 @@ const Game = (props) => {
 
             // your turn has started
             socket.on('start your turn', words => {
+                console.log('start your turn');
                 setIsYourTurn(true);
+                setTurnEnded(false);
+                setTurnStarted(false);
                 setChooseWords(words);
+            });
+
+            // it is the userId's turn
+            socket.on('switch turns', data => {
+                let id = authenticationService.getId();
+                if (id !== data.userId) {
+                    setIsYourTurn(false);
+                    setTurnEnded(false);
+                    setTurnStarted(false);
+                }
             });
 
             // a new players turn started
             socket.on('turn started', (data) => {
+                setWords([]);
                 setRound(data.round);
                 setWordHint(data.wordHint);
                 setTurnStarted(true);
+                setTurnEnded(false);
             });
 
             // timer updates
             socket.on('timer', time => {
                 setTimer(time);
+            });
+
+            // turn ends
+            socket.on('turn end', data => {
+                handleTurnEnd(data.word);
+                setTimer(0);
             });
         }
     }, []);
@@ -153,6 +177,11 @@ const Game = (props) => {
         });
         setWordHint(word);
         setChooseWords([]);
+    }
+
+    function handleTurnEnd(word) {
+        setTurnEnded(true);
+        setCorrectWord(word);
     }
 
     return (
@@ -182,10 +211,16 @@ const Game = (props) => {
                                 })}
                             </div>}
                         </div>}
+                        { turnEnded && 
+                            <div className={classes.wordPicker}>
+                                <h1>{"Turn over"}</h1>
+                                <h2>{`The correct word was: ${correctWord}`}</h2>
+                            </div>
+                        }
                     </div>
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2}>
-                    <Chat words={words} onNewWord={handleSendWord}/>
+                    <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>
         </div>

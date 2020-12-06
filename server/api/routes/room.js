@@ -15,7 +15,6 @@ router.post('/create', auth, async (req, res) => {
             Timer: 30,
             IsSpellCheck: false,
             HostId: mongoose.Types.ObjectId(hostId),
-            UserIds: [mongoose.Types.ObjectId(hostId)],
         });
 
         // save room into database
@@ -30,9 +29,6 @@ router.post('/create', auth, async (req, res) => {
                 timer: savedRoom.Timer,
                 isSpellCheck: savedRoom.IsSpellCheck,
                 hostId: savedRoom.HostId,
-                userIds: [
-                    hostId
-                ]
             }
         });
     }
@@ -53,7 +49,7 @@ router.get('/find/:roomId', auth, async (req, res) => {
             return res.status(404).json({Error: "Room not found"});
         
         let users = await User.find({
-            _id: { $in: room.UserIds}
+            _id: { $in: room.UserIds.map(i => i._id)}
         },
         '_id Name EmojiId');
 
