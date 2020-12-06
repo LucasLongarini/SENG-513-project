@@ -83,6 +83,10 @@ async function newWord(io, socket, word, userId, roomId, userName) {
     let roundWord = game.RoundWord;
     let roundWordDifficulty = game.RoundWordDifficulty;
 
+    //round has not started;
+    if (roundWord === "")
+        return;
+
     if (roundWord === word){
         io.to(roomId).emit('new guess', {name: userName, word: undefined, isCorrect: true});
         io.to(roomId).emit('correct guess', userId);
@@ -192,7 +196,7 @@ async function startTurn(io, socket, userId, roomId, data) {
         let timerInterval = setInterval(() => {
             io.to(roomId).emit('timer', timer);
             if (timer === 0) {
-                // TODO: end turn
+                endTurn(io, roomId);
                 clearInterval(timerInterval);
             }
             timer--;
@@ -216,13 +220,17 @@ async function endTurn(io, roomId, game) {
         clearInterval(timer);
         delete Timers[roomId];
 
+        if (game === undefined)
+            game = await Game.findOne({RoomId: roomId});
+        
         io.to(roomId).emit('turn end', {
             word: game.RoundWord
         });
 
         // check if the round is over (all players have HasCompletedTurn)
         if (!game.Players.find(i => !i.HasCompletedTurn)) {
-            // TODO: handle round over.
+            endRound(io, roomId, game);
+            return;
         }
 
         let nextPlayerId;
@@ -238,13 +246,46 @@ async function endTurn(io, roomId, game) {
                 nextPlayerChosen = true;
             }
         }
+        game.RoundWord = "";
         await game.save();
 
+        //in 5 seconds, start turn for the next player
         setTimeout(() => {
             switchTurns(io, nextPlayerSocketId, nextPlayerId, roomId);
         }, 5000);
-        //in 5 seconds, start turn for the next player
 
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+async function endRound(io, roomId, game) {
+    try {
+        let round = game.CurrentRound;
+        round++;
+        
+        if (round > game.TotalRounds) {
+            // TODO: add top 3 scores;
+            io.to(roomId).emit('game over');
+            return;
+        }
+
+        // update game values
+        game.CurrentRound = round;
+        for (let player of game.Players) {
+            player.HasGuessedCorrectly = false;
+            player.HasCompletedTurn = false;
+        }
+        await game.save();
+
+        let nextPlayerId = game.Players[0]._id;
+        let nextPlayerSocketId = game.Players[0].SocketId;
+
+        //in 5 seconds, start turn for the next player
+        setTimeout(() => {
+            switchTurns(io, nextPlayerSocketId, nextPlayerId, roomId);
+        }, 5000);
     }
     catch (error) {
         console.log(error);

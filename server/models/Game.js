@@ -15,7 +15,7 @@ const GameSchema = mongoose.Schema({
         default: 1
     },
     Players: [{
-        Id: mongoose.ObjectId,
+        _id: mongoose.ObjectId,
         SocketId: String,
         HasCompletedTurn: {
             type: Boolean,

@@ -116,7 +116,6 @@ const Game = (props) => {
 
             // your turn has started
             socket.on('start your turn', words => {
-                console.log('start your turn');
                 setIsYourTurn(true);
                 setTurnEnded(false);
                 setTurnStarted(false);
@@ -150,6 +149,7 @@ const Game = (props) => {
             // turn ends
             socket.on('turn end', data => {
                 handleTurnEnd(data.word);
+                setWordHint("");
                 setTimer(0);
             });
         }

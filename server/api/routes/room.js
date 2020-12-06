@@ -12,7 +12,7 @@ router.post('/create', auth, async (req, res) => {
         let room = new Room({
             IsPrivate: false,
             Rounds: 1,
-            Timer: 30,
+            Timer: 90,
             IsSpellCheck: false,
             HostId: mongoose.Types.ObjectId(hostId),
         });
