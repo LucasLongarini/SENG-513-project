@@ -10,6 +10,7 @@ import {
 } from '@material-ui/core';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import authenticationService from '../../../services/AuthenticationService';
 
 toast.configure();
 
@@ -83,7 +84,13 @@ const useStyles = makeStyles((theme) => ({
         display: 'grid',
         gridGap: '8px',
         gridTemplateColumns: '1fr 1fr 1fr'
-    }
+    },
+    wordHint: {
+        whiteSpace: 'break-spaces'
+    },
+    headerItems: {
+        margin: 'auto',
+    },
 }));
 
 const Game = (props) => {
@@ -94,15 +101,62 @@ const Game = (props) => {
     const classes = useStyles();
     const router = useHistory();
     const [words, setWords] = useState([]);
+    const [chooseWords, setChooseWords] = useState([]);
+    const [turnStarted, setTurnStarted] = useState(false);
+    const [isYourTurn, setIsYourTurn] = useState(false);
+    const [turnEnded, setTurnEnded] = useState(false);
+    const [correctWord, setCorrectWord] = useState("");
+    const [timer, setTimer] = useState(0);
+    const [round, setRound] = useState(1);
+    const [wordHint, setWordHint] = useState("");
 
     useEffect(() => {
         if (socket !== undefined) {
-            socket.on('new word', handleNewWord);
+            socket.on('new guess', handleNewGuess);
+
+            // your turn has started
+            socket.on('start your turn', words => {
+                setIsYourTurn(true);
+                setTurnEnded(false);
+                setTurnStarted(false);
+                setChooseWords(words);
+            });
+
+            // it is the userId's turn
+            socket.on('switch turns', data => {
+                let id = authenticationService.getId();
+                if (id !== data.userId) {
+                    setIsYourTurn(false);
+                    setTurnEnded(false);
+                    setTurnStarted(false);
+                }
+            });
+
+            // a new players turn started
+            socket.on('turn started', (data) => {
+                setWords([]);
+                setRound(data.round);
+                setWordHint(data.wordHint);
+                setTurnStarted(true);
+                setTurnEnded(false);
+            });
+
+            // timer updates
+            socket.on('timer', time => {
+                setTimer(time);
+            });
+
+            // turn ends
+            socket.on('turn end', data => {
+                handleTurnEnd(data.word);
+                setWordHint("");
+                setTimer(0);
+            });
         }
     }, []);
 
-    function handleNewWord(data) {
-        let newWord = {name: data.name, word: data.word};
+    function handleNewGuess(data) {
+        let newWord = {name: data.name, word: data.word, isCorrect: data.isCorrect};
         setWords(oldWords => [...oldWords, newWord]);
     }
 
@@ -116,6 +170,20 @@ const Game = (props) => {
             socket.emit('send word', word);
     }
 
+    function handleWordSelection(word, difficulty) {
+        socket.emit('word selected', {
+            word: word,
+            difficulty: difficulty
+        });
+        setWordHint(word);
+        setChooseWords([]);
+    }
+
+    function handleTurnEnd(word) {
+        setTurnEnded(true);
+        setCorrectWord(word);
+    }
+
     return (
         <div className={classes.root} >
             <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
@@ -124,26 +192,35 @@ const Game = (props) => {
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
                             <Grid container className={classes.gameHeader}>
-                                <Grid item xs={1} sm={3}>Round</Grid>
-                                <Grid item xs={1} sm={6}>{`S _ _ E _   M _ N`}</Grid>
-                                <Grid item xs={1} sm={3}>Time</Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Round: ${round}`}</Grid>
+                                <Grid item xs={1} sm={6}>
+                                    <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
+                                </Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Time: ${timer}s`}</Grid>
                             </Grid>
                         </Paper>
                     </div>
                     <div className={classes.game} >
                         <GameBoard socketRef={socket} />
-                        <div className={classes.wordPicker}>
-                            <h1>Choose a word:</h1>
-                            <div className={classes.wordGrid}>
-                                <Button variant="contained">Word 1</Button>
-                                <Button variant="contained">Word 2</Button>
-                                <Button variant="contained">Word 3</Button>
+                        {!turnStarted && <div className={classes.wordPicker}>
+                            <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word"}</h1>
+                            { isYourTurn && <div className={classes.wordGrid}>
+                                {chooseWords && chooseWords.map((word, index) => {
+                                    return <Button key={index} onClick={() => handleWordSelection(word.word, word.difficulty)} 
+                                        variant="contained">{word.word}</Button>
+                                })}
+                            </div>}
+                        </div>}
+                        { turnEnded && 
+                            <div className={classes.wordPicker}>
+                                <h1>{"Turn over"}</h1>
+                                <h2>{`The correct word was: ${correctWord}`}</h2>
                             </div>
-                        </div>
+                        }
                     </div>
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2}>
-                    <Chat words={words} onNewWord={handleSendWord}/>
+                    <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>
         </div>

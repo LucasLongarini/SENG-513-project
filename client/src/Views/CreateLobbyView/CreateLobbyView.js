@@ -81,6 +81,8 @@ function CreateLobbyView(props) {
   const [timer, setTimer] = useState("-");
   const [rounds, setRounds] = useState("-");
   const [errorMessage, setErrorMessage] = useState("");
+  const [drawingUserId, setDrawingUserId] = useState("");
+  const [correctUserIds, setCorrectUserIds] = useState([]);
 
   useEffect(() => {
 
@@ -122,35 +124,6 @@ function CreateLobbyView(props) {
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (socket !== undefined) {
-      socket.on('user connected', (user) => {
-        userConnected(user);
-      });
-  
-      socket.on('user disconnected', (userId) => {
-        userDisconnected(userId);
-      });
-
-      socket.on('new host', hostId => {
-        newHost(hostId);
-      })
-    }
-  }, [users, connected])
-
-  useEffect(() => {
-    if (socket !== undefined) {
-      socket.on('new room settings', (data) => {
-        if (data.timer !== undefined) {
-          setTimer(data.timer);
-        }
-        if (data.rounds !== undefined) {
-          setRounds(data.rounds);
-        }
-      });
-    }
-  }, [timer, rounds, connected]);
 
   async function updateRoom(updatedData) {
     try {
@@ -217,6 +190,32 @@ function CreateLobbyView(props) {
     socket.on('game start', () => {
       setIsGameStarted(true);
     });
+    socket.on('switch turns', data => {
+      setDrawingUserId(data.userId);
+    });
+    socket.on('correct guess', userId => {
+      setCorrectUserIds(oldIds => [...oldIds, userId]);
+    });
+    socket.on('user connected', (user) => {
+      userConnected(user);
+    });
+    socket.on('user disconnected', (userId) => {
+      userDisconnected(userId);
+    });
+    socket.on('new host', hostId => {
+      newHost(hostId);
+    });
+    socket.on('new room settings', (data) => {
+      if (data.timer !== undefined) {
+        setTimer(data.timer);
+      }
+      if (data.rounds !== undefined) {
+        setRounds(data.rounds);
+      }
+    });
+    socket.on('turn started', () => {
+      setCorrectUserIds([]);
+    });
   }
 
   function goToGame() {
@@ -224,14 +223,11 @@ function CreateLobbyView(props) {
   }
 
   function userConnected(user) {
-    if (!users.find(i => i.id === user.id)) {
-      setUsers(oldUsers => [...oldUsers, user]);
-    }
+    setUsers(oldUsers => [...oldUsers, user]);
   }
 
   function userDisconnected(userId) {
-    let newUsers = users.filter(i => i.id !== userId);
-    setUsers(newUsers);
+    setUsers(oldUsers => oldUsers.filter(i => i.id !== userId));
   }
 
   function newHost(hostId) {
@@ -301,13 +297,11 @@ function CreateLobbyView(props) {
               <DoodleHeader />
             </Grid>
             <Grid item xs={2} className={classes.customizeViewGridItem}> 
-              <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+              <ParticipantView correctUserIds={correctUserIds} drawingUserId={drawingUserId} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             </Grid>
             <Grid item xs={10} className={classes.customizeViewGridItem}>
               {
                 <GameView
-                  participants={<ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>}
-                  initialRoomSettings={initialRoomSettings} 
                   roomId={roomId}
                   socket={socket}
                 />

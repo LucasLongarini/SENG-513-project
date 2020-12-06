@@ -7,10 +7,10 @@
     position: relative;
 }
 
-.JoinedUser-container:nth-child(2),
-.JoinedUser-container:nth-child(3),
-.JoinedUser-container:nth-child(6),
-.JoinedUser-container:nth-child(7){
+.JoinedUser-Regular:nth-child(2),
+.JoinedUser-Regular:nth-child(3),
+.JoinedUser-Regular:nth-child(6),
+.JoinedUser-Regular:nth-child(7){
     background-color: rgb(230, 230, 230);
 }
 
@@ -31,17 +31,27 @@
     top: 3px; left: 3px;
 }
 
+.JoinedUser-pencil {
+    position: absolute;
+    top: 3px; right: 3px;
+}
+
+.JoinedUser-Correct {
+    background-color: #96FF96;
+}
+
+
 @media screen and (max-width: 960px) {
-    .JoinedUser-container:nth-child(2),
-    .JoinedUser-container:nth-child(4),
-    .JoinedUser-container:nth-child(5),
-    .JoinedUser-container:nth-child(7){
+    .JoinedUser-Regular:nth-child(2),
+    .JoinedUser-Regular:nth-child(4),
+    .JoinedUser-Regular:nth-child(5),
+    .JoinedUser-Regular:nth-child(7){
         background-color: rgb(230, 230, 230);
     }
-    .JoinedUser-container:nth-child(1),
-    .JoinedUser-container:nth-child(3),
-    .JoinedUser-container:nth-child(6),
-    .JoinedUser-container:nth-child(8){
+    .JoinedUser-Regular:nth-child(1),
+    .JoinedUser-Regular:nth-child(3),
+    .JoinedUser-Regular:nth-child(6),
+    .JoinedUser-Regular:nth-child(8){
         background-color: white;
     }
 }
