@@ -58,6 +58,11 @@ module.exports = function(io) {
             newWord(io, socket, word, userId, roomId, userName);
         });
 
+        // Drawing events
+        socket.on('drawing1', drawingData => {
+            socket.broadcast.to(roomId).emit('drawing', drawingData);
+        });
+
     });
 }
 

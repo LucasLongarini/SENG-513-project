@@ -205,7 +205,7 @@ const Game = ({socket}) => {
                         </Paper>
                     </div>
                     <div className={classes.game} >
-                        <GameBoard socketRef={socket} />
+                        <GameBoard socket={socket} />
                         {!turnStarted && <div className={classes.wordPicker}>
                             <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word"}</h1>
                             { isYourTurn && <div className={classes.wordGrid}>
