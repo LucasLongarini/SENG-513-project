@@ -18,10 +18,7 @@ import {
   Container,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import useSound from 'use-sound';
 
-import userLeftSound from '../../assets/sounds/userLeft.mp3';
-import userJoinedSound from '../../assets/sounds/userJoined.mp3';
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
@@ -82,8 +79,7 @@ function CreateLobbyView() {
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
   const [canStartGame, setCanStartGame] = useState(false);
-  const [playJoinedSound] = useSound(userJoinedSound);
-  const [playLeftSound] = useSound(userLeftSound);
+
 
   useEffect(() => {
 
@@ -237,12 +233,10 @@ function CreateLobbyView() {
   }
 
   function userConnected(user) {
-    playJoinedSound();
     setUsers(oldUsers => [...oldUsers, user]);
   }
 
   function userDisconnected(userId) {
-    playLeftSound();
     setUsers(oldUsers => oldUsers.filter(i => i.id !== userId));
   }
 
