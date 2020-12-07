@@ -1,7 +1,4 @@
 import React from 'react';
-import { 
-    Typography , 
-} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -10,13 +7,13 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    textAlign: 'center',
     width: '100%',
     marginTop: '5px',
   },
   name: {
     fontWeight: '600',
-    fontSize: '15 px'
+    fontSize: '15 px',
+    textAlign: 'left',
   },
   text: {
     marginLeft: '10px',

@@ -14,7 +14,6 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import io from 'socket.io-client';
 import {
-  Paper,
   Grid,
   Container,
 } from '@material-ui/core';
@@ -67,6 +66,10 @@ let socket;
 function CreateLobbyView(props) {
   const classes = useStyles();
 
+  window.onbeforeunload = function() {
+    return "Your place will be reset, are you sure?";
+  };
+
   let { roomId } = useParams();
   const [isHost, setIsHost] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -76,13 +79,13 @@ function CreateLobbyView(props) {
   const [isInviteLinkOpen, setIsInviteLinkOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [hostId, setHostId] = useState("");
-  const [connected, setConnected] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [timer, setTimer] = useState("-");
   const [rounds, setRounds] = useState("-");
   const [errorMessage, setErrorMessage] = useState("");
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
+  const [canStartGame, setCanStartGame] = useState(false);
 
   useEffect(() => {
 
@@ -124,6 +127,10 @@ function CreateLobbyView(props) {
       }
     }
   }, []);
+
+  useEffect(() => {
+    setCanStartGame(users.length > 1);
+  }, [users]);
 
   async function updateRoom(updatedData) {
     try {
@@ -179,7 +186,6 @@ function CreateLobbyView(props) {
         roomId: roomId,
       }
     });
-    setConnected(true);
 
     socket.on('force disconnect', () => {
       disconnect();
@@ -266,7 +272,7 @@ function CreateLobbyView(props) {
                         <h1>Loading...</h1>
                     </div> :
                     (isHost ?
-                      <CustomizeView className='' initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} startGame={startGame}/> :
+                      <CustomizeView canStartGame={canStartGame} className='' initialRoomSettings={initialRoomSettings} roomId={roomId} updateRoom={updateRoom} startGame={startGame}/> :
                       <div className="CreateLobbyView-waiting">
                         <h1>Waiting for game to start...</h1>
                         <h2>{`# of rounds: ${rounds} • Time each round: ${timer}s`}</h2>
