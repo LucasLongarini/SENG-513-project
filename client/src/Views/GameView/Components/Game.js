@@ -11,6 +11,7 @@ import {
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import authenticationService from '../../../services/AuthenticationService';
+import {useSpring, animated} from 'react-spring';
 
 toast.configure();
 
@@ -78,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         flexDirection: 'column',
         color: 'white',
+        textAlign: 'center',
     },
     wordGrid: {
         marginTop: '10px',
@@ -93,10 +95,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Game = (props) => {
-    const {
-        socket,
-    } = props;
+const Game = ({socket}) => {
+    
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
     const router = useHistory();
@@ -109,6 +109,10 @@ const Game = (props) => {
     const [timer, setTimer] = useState(0);
     const [round, setRound] = useState(1);
     const [wordHint, setWordHint] = useState("");
+    const animationProps = useSpring({
+        from: {opacity: 0},
+        to: {opacity: 1}
+    });
 
     useEffect(() => {
         if (socket !== undefined) {
@@ -213,8 +217,10 @@ const Game = (props) => {
                         </div>}
                         { turnEnded && 
                             <div className={classes.wordPicker}>
-                                <h1>{"Turn over"}</h1>
-                                <h2>{`The correct word was: ${correctWord}`}</h2>
+                                <animated.div style={animationProps}>
+                                    <h1>{"Turn over"}</h1>
+                                    <h2>{`The correct word was: ${correctWord}`}</h2>
+                                </animated.div>
                             </div>
                         }
                     </div>

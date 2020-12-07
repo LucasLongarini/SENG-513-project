@@ -1,7 +1,5 @@
 import { React, useRef, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import io from 'socket.io-client';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -39,16 +37,14 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GameBoard = (props) => {
+const GameBoard = ({socket}) => {
     const canvasRef = useRef(null);
-    const socketRef = useRef();
     const [activeColor, setActiveColor] = useState('black');
     let isDrawing = false;
     let currentX = '';
     let currentY = '';
     
     const classes = useStyles();
-    const router = useHistory();
 
     useEffect(() => {
         console.log('main use effect')
@@ -66,9 +62,20 @@ const GameBoard = (props) => {
         window.addEventListener('resize', onResize, false);
         onResize();
     
-        // socket func
-        // socketRef.current = io.connect('/');
-        // socketRef.current.on('drawing', onDrawingEvent);
+        // prevent memory leaks
+        return () => {
+            canvas.removeEventListener('mousedown', onMouseDown, false);
+            canvas.removeEventListener('mouseup', onMouseUp, false);
+            canvas.removeEventListener('mouseout', onMouseUp, false);
+            canvas.removeEventListener('mousemove', throttle(onMouseMove, 5), false);
+        
+            canvas.removeEventListener('touchstart', onMouseDown, false);
+            canvas.removeEventListener('touchend', onMouseUp, false);
+            canvas.removeEventListener('touchcancel', onMouseUp, false);
+            canvas.removeEventListener('touchmove', onMouseMove, false);
+        
+            window.removeEventListener('resize', onResize, false);
+        }
     }, []);
 
     const drawLine = (x0, y0, x1, y1, color, emit) => {

@@ -17,9 +17,11 @@ import {
   Grid,
   Container,
 } from '@material-ui/core';
-
 import { makeStyles } from '@material-ui/core/styles';
+import useSound from 'use-sound';
 
+import userLeftSound from '../../assets/sounds/userLeft.mp3';
+import userJoinedSound from '../../assets/sounds/userJoined.mp3';
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
@@ -58,17 +60,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
 toast.configure();
 let socket;
 
-function CreateLobbyView(props) {
+function CreateLobbyView() {
   const classes = useStyles();
-
-  window.onbeforeunload = function() {
-    return "Your place will be reset, are you sure?";
-  };
 
   let { roomId } = useParams();
   const [isHost, setIsHost] = useState(false);
@@ -86,6 +82,8 @@ function CreateLobbyView(props) {
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
   const [canStartGame, setCanStartGame] = useState(false);
+  const [playJoinedSound] = useSound(userJoinedSound);
+  const [playLeftSound] = useSound(userLeftSound);
 
   useEffect(() => {
 
@@ -121,7 +119,10 @@ function CreateLobbyView(props) {
     }
     GetRoomInformation();
 
+    window.addEventListener("beforeunload", handleRefresh);
+    
     return () => { 
+      window.removeEventListener("beforeunload", handleRefresh);
       if (socket) {
         socket.disconnect();
       }
@@ -131,6 +132,13 @@ function CreateLobbyView(props) {
   useEffect(() => {
     setCanStartGame(users.length > 1);
   }, [users]);
+
+  function handleRefresh(e) {
+    var confirmationMessage = 'Your place will be reset, are you sure you want to refresh?';
+
+    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+  }
 
   async function updateRoom(updatedData) {
     try {
@@ -229,10 +237,12 @@ function CreateLobbyView(props) {
   }
 
   function userConnected(user) {
+    playJoinedSound();
     setUsers(oldUsers => [...oldUsers, user]);
   }
 
   function userDisconnected(userId) {
+    playLeftSound();
     setUsers(oldUsers => oldUsers.filter(i => i.id !== userId));
   }
 
