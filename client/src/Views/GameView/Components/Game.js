@@ -13,6 +13,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import authenticationService from '../../../services/AuthenticationService';
 import {useSpring, animated} from 'react-spring';
 import GameOverModal from '../Components/GameOverModal/GameOverModal';
+import {Howl, Howler} from 'howler';
+import correctWordSrc from '../../../assets/sounds/correctWord.mp3';
+import turnStartSrc from '../../../assets/sounds/turnStart.mp3';
 
 toast.configure();
 
@@ -97,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Game = ({socket, handlePlayAgain}) => {
-    
+    Howler.volume(0.8);
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
     const [words, setWords] = useState([]);
@@ -115,6 +118,9 @@ const Game = ({socket, handlePlayAgain}) => {
         from: {opacity: 0},
         to: {opacity: 1}
     });
+    const correctWordSound = new Howl({src: correctWordSrc});
+    const turnStartSound = new Howl({src: turnStartSrc});
+
 
     useEffect(() => {
         if (socket !== undefined) {
@@ -140,6 +146,7 @@ const Game = ({socket, handlePlayAgain}) => {
 
             // a new players turn started
             socket.on('turn started', (data) => {
+                turnStartSound.play();
                 setWords([]);
                 setRound(data.round);
                 setWordHint(data.wordHint.toUpperCase());
@@ -171,6 +178,9 @@ const Game = ({socket, handlePlayAgain}) => {
     }
 
     function handleNewGuess(data) {
+        if (data.isCorrect) 
+            correctWordSound.play();
+        
         let newWord = {name: data.name, word: data.word, isCorrect: data.isCorrect};
         setWords(oldWords => [...oldWords, newWord]);
     }

@@ -18,6 +18,9 @@ import {
   Container,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import {Howl, Howler} from 'howler';
+import joinedSoundSrc from '../../assets/sounds/userJoined.mp3';
+import leftSoundSrc from '../../assets/sounds/userLeft.mp3';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,6 +64,7 @@ toast.configure();
 let socket;
 
 function CreateLobbyView() {
+  Howler.volume(0.8);
   const classes = useStyles();
 
   let { roomId } = useParams();
@@ -80,6 +84,9 @@ function CreateLobbyView() {
   const [correctUserIds, setCorrectUserIds] = useState([]);
   const [canStartGame, setCanStartGame] = useState(false);
   const [scores, setScores] = useState([]);
+  const joinedSound = new Howl({src: joinedSoundSrc});
+  const leftSound = new Howl({src: leftSoundSrc});
+
 
   useEffect(() => {
 
@@ -240,10 +247,12 @@ function CreateLobbyView() {
   }
 
   function userConnected(user) {
+    joinedSound.play();
     setUsers(oldUsers => [...oldUsers, user]);
   }
 
   function userDisconnected(userId) {
+    leftSound.play();
     setUsers(oldUsers => oldUsers.filter(i => i.id !== userId));
   }
 
