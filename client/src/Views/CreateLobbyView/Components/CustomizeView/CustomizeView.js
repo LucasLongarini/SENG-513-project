@@ -3,9 +3,17 @@ import './CustomizeView.css';
 import { Button, TextField, Switch, FormControlLabel, FormControl, Select, InputLabel, IconButton } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import _ from "lodash";
+import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 
+const useStyles = makeStyles((theme) => ({
+  disabledButton: {
+    color: "white",
+  }
+}));
+
 function CustomizeView(props) {
+  const classes = useStyles();
   const router = useHistory();
   const [isPrivate, setIsPrivate] = useState(props.initialRoomSettings.isPrivate);
   const [password, setPassword] = useState(props.initialRoomSettings.password ? props.initialRoomSettings.password : "");
@@ -118,9 +126,9 @@ function CustomizeView(props) {
       <Button variant="contained" color="secondary" onClick={props.startGame}
         disableElevation style={{
           borderRadius: 0,
-          color: "white"
-        }}>    
-        Start Game
+        }} disabled={!props.canStartGame}
+        className={classes.disabledButton}>    
+        {props.canStartGame ? "Start Game" : "Waiting for more players"}
       </Button>
     </div>
   );
