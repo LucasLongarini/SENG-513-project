@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import authenticationService from '../../../services/AuthenticationService';
 import {useSpring, animated} from 'react-spring';
+import GameOverModal from '../Components/GameOverModal/GameOverModal';
 
 toast.configure();
 
@@ -95,11 +96,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Game = ({socket}) => {
+const Game = ({socket, handlePlayAgain}) => {
     
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
-    const router = useHistory();
     const [words, setWords] = useState([]);
     const [chooseWords, setChooseWords] = useState([]);
     const [turnStarted, setTurnStarted] = useState(false);
@@ -109,6 +109,8 @@ const Game = ({socket}) => {
     const [timer, setTimer] = useState(0);
     const [round, setRound] = useState(1);
     const [wordHint, setWordHint] = useState("");
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [topUsers, setTopUsers] = useState([]);
     const animationProps = useSpring({
         from: {opacity: 0},
         to: {opacity: 1}
@@ -140,7 +142,7 @@ const Game = ({socket}) => {
             socket.on('turn started', (data) => {
                 setWords([]);
                 setRound(data.round);
-                setWordHint(data.wordHint);
+                setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);
                 setTurnEnded(false);
             });
@@ -156,8 +158,17 @@ const Game = ({socket}) => {
                 setWordHint("");
                 setTimer(0);
             });
+
+            socket.on('game over', topUsers => {
+                handleGameOver(topUsers);
+            })
         }
     }, []);
+
+    function handleGameOver(topUsers) {
+        setTopUsers(topUsers);
+        setIsGameOver(true);
+    }
 
     function handleNewGuess(data) {
         let newWord = {name: data.name, word: data.word, isCorrect: data.isCorrect};
@@ -170,8 +181,12 @@ const Game = ({socket}) => {
     }
 
     function handleSendWord(word) {
-        if (word !== undefined && word.length > 0)
-            socket.emit('send word', word);
+        if (word !== undefined && word.length > 0) {
+            socket.emit('send word', {
+                word: word,
+                timeLeft: timer
+            });
+        }
     }
 
     function handleWordSelection(word, difficulty) {
@@ -179,13 +194,13 @@ const Game = ({socket}) => {
             word: word,
             difficulty: difficulty
         });
-        setWordHint(word);
+        setWordHint(word.toUpperCase());
         setChooseWords([]);
     }
 
     function handleTurnEnd(word) {
         setTurnEnded(true);
-        setCorrectWord(word);
+        setCorrectWord(word.toUpperCase());
     }
 
     return (
@@ -219,7 +234,10 @@ const Game = ({socket}) => {
                             <div className={classes.wordPicker}>
                                 <animated.div style={animationProps}>
                                     <h1>{"Turn over"}</h1>
-                                    <h2>{`The correct word was: ${correctWord}`}</h2>
+                                    <h2>
+                                        <span style={{fontWeight: 400}}>The Correct word was: </span>
+                                        {correctWord}
+                                    </h2>
                                 </animated.div>
                             </div>
                         }
@@ -229,6 +247,8 @@ const Game = ({socket}) => {
                     <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>
+        
+            <GameOverModal handlePlayAgain={handlePlayAgain} topUsers={topUsers} isOpen={isGameOver} />
         </div>
     );
     
