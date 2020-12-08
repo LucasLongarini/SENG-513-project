@@ -79,7 +79,7 @@ function CreateLobbyView() {
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
   const [canStartGame, setCanStartGame] = useState(false);
-
+  const [scores, setScores] = useState([]);
 
   useEffect(() => {
 
@@ -226,6 +226,13 @@ function CreateLobbyView() {
     socket.on('turn started', () => {
       setCorrectUserIds([]);
     });
+    socket.on('scores', scores => {
+      handleNewScores(scores);
+    });
+  }
+
+  function handleNewScores(scores) {
+    setScores(scores);
   }
 
   function goToGame() {
@@ -268,7 +275,7 @@ function CreateLobbyView() {
               <DoodleHeader />
             </Grid>
             <Grid item xs={12} md={4} className={classes.customizeViewGridItem}> 
-              <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+              <ParticipantView isGame={false} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             </Grid>
             <Grid item xs={12} md={8} className={classes.customizeViewGridItem}>
               { isLoading ? 
@@ -307,7 +314,7 @@ function CreateLobbyView() {
               <DoodleHeader />
             </Grid>
             <Grid item xs={2} className={classes.customizeViewGridItem}> 
-              <ParticipantView correctUserIds={correctUserIds} drawingUserId={drawingUserId} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+              <ParticipantView isGame={true} scores={scores} correctUserIds={correctUserIds} drawingUserId={drawingUserId} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             </Grid>
             <Grid item xs={10} className={classes.customizeViewGridItem}>
               {

@@ -54,8 +54,8 @@ module.exports = function(io) {
             startTurn(io, socket, userId, roomId, data);
         });
 
-        socket.on('send word', word => {
-            newWord(io, socket, word, userId, roomId, userName);
+        socket.on('send word', data => {
+            newWord(io, data.word, data.timeLeft, userId, roomId, userName);
         });
 
         // Drawing events
@@ -80,13 +80,16 @@ async function getGameState(socket, roomId) {
 }
 
 // checks if word is correct. If it is, marks the player and checks if all players have guessed correctly
-async function newWord(io, socket, word, userId, roomId, userName) {
+async function newWord(io, word, timeLeft, userId, roomId, userName) {
     let game = await Game.findOne({RoomId: roomId});
     if (game === null)
         return;
     
     let roundWord = game.RoundWord;
     let roundWordDifficulty = game.RoundWordDifficulty;
+    let maxTimer = game.Timer;
+    let currentTurn = game.CurrentTurn;
+    let nPlayers = game.Players.length;
 
     //round has not started;
     if (roundWord === "")
@@ -96,8 +99,18 @@ async function newWord(io, socket, word, userId, roomId, userName) {
         io.to(roomId).emit('new guess', {name: userName, word: undefined, isCorrect: true});
         io.to(roomId).emit('correct guess', userId);
 
+        let score = roundWordDifficulty * timeLeft;
+        score = wordGenerator.getScore(score, maxTimer);
+    
         await Game.updateOne({ 'Players._id': mongoose.Types.ObjectId(userId)},{
             $set: {'Players.$.HasGuessedCorrectly': true},
+            $inc: {'Players.$.Score': score}
+        });
+
+        // update drawer score for every correct guess
+        let drawerScore = Math.floor((1000 / (nPlayers - 1))/100)*100 
+        await Game.updateOne({ 'Players._id': currentTurn}, {
+            $inc: {'Players.$.Score': drawerScore}
         });
 
         // check if all players have guessed corretly
@@ -106,6 +119,15 @@ async function newWord(io, socket, word, userId, roomId, userName) {
             endTurn(io, roomId, game);
         }
 
+        // send scores
+        io.to(roomId).emit('scores',
+            game.Players.map(p => {
+                return {
+                    id: p._id,
+                    score: p.Score
+                }
+            }) 
+        );
 
     }
     else {

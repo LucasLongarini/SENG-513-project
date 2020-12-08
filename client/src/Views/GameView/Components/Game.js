@@ -140,7 +140,7 @@ const Game = ({socket}) => {
             socket.on('turn started', (data) => {
                 setWords([]);
                 setRound(data.round);
-                setWordHint(data.wordHint);
+                setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);
                 setTurnEnded(false);
             });
@@ -170,8 +170,12 @@ const Game = ({socket}) => {
     }
 
     function handleSendWord(word) {
-        if (word !== undefined && word.length > 0)
-            socket.emit('send word', word);
+        if (word !== undefined && word.length > 0) {
+            socket.emit('send word', {
+                word: word,
+                timeLeft: timer
+            });
+        }
     }
 
     function handleWordSelection(word, difficulty) {
@@ -179,13 +183,13 @@ const Game = ({socket}) => {
             word: word,
             difficulty: difficulty
         });
-        setWordHint(word);
+        setWordHint(word.toUpperCase());
         setChooseWords([]);
     }
 
     function handleTurnEnd(word) {
         setTurnEnded(true);
-        setCorrectWord(word);
+        setCorrectWord(word.toUpperCase());
     }
 
     return (
