@@ -325,8 +325,23 @@ async function endGame(io, roomId, game) {
         clearInterval(timer);
         delete Timers[roomId];
     }
-    // TODO: add top 3 scores;
-    io.to(roomId).emit('game over');
+    
+    let players = game.Players;
+    players.sort((a,b) => b.Score - a.Score);
+    let topPlayers = players.slice(0,3);
+    // get players
+    let users = await User.find({
+        _id: { $in: topPlayers.map(i => i._id)}
+    },
+    '_id Name EmojiId');
+
+    io.to(roomId).emit('game over', topPlayers.map((x, index) => {
+        return {
+            name: users.find(i => i._id.toString() === x._id.toString()).Name,
+            emojiId: users.find(i => i._id.toString() === x._id.toString()).EmojiId,
+            place: index + 1
+        }
+    }));
 
     await Game.deleteOne({RoomId: mongoose.Types.ObjectId(roomId)});
 }

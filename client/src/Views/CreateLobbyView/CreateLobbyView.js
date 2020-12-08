@@ -267,6 +267,10 @@ function CreateLobbyView() {
     setIsValidRoom(false);
   }
 
+  function resetGame() {
+    setIsGameStarted(false);
+  }
+
   const createLobbyContent = () => (
     <div className={classes.root}>
       <Container className={classes.container} maxWidth='md'>
@@ -321,6 +325,7 @@ function CreateLobbyView() {
                 <GameView
                   roomId={roomId}
                   socket={socket}
+                  handlePlayAgain={resetGame}
                 />
               }
             </Grid>
