@@ -78,9 +78,9 @@ const GameBoard = (props) => {
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         context.strokeStyle = color;
-        context.lineWidth = 2;
+        context.lineWidth = 10;
         context.stroke();
-        context.closePath();
+        // context.closePath();
   
         if (!emit) return;
 
@@ -115,7 +115,6 @@ const GameBoard = (props) => {
     };
 
     const onMouseMove = (e) => {
-
         if (!isDrawing) {
             return;
         }

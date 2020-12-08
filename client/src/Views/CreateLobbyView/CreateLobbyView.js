@@ -287,9 +287,9 @@ function CreateLobbyView(props) {
   )
 
   const renderViewContent = () => {
-    if (!isGameStarted) {
-      return createLobbyContent();
-    }
+    // if (!isGameStarted) {
+    //   return createLobbyContent();
+    // }
     return (
       <div className={classes.root}>
         <Grid className={classes.gridContainer} container spacing={3}>

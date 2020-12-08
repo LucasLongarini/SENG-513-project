@@ -78,6 +78,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         flexDirection: 'column',
         color: 'white',
+        display: 'none', // remove 
     },
     wordGrid: {
         marginTop: '10px',
