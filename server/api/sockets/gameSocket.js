@@ -60,7 +60,15 @@ module.exports = function(io) {
 
         // Drawing events
         socket.on('drawing1', drawingData => {
-            socket.broadcast.to(roomId).emit('drawing', drawingData);
+            socket.broadcast.to(roomId).emit('drawing', { ...drawingData, eventType: 'drawing'});
+        });
+
+        socket.on('clear', () => {
+            socket.broadcast.to(roomId).emit('clear board', {eventType: 'clear board'});
+        });
+
+        socket.on('fill', color => {
+            socket.broadcast.to(roomId).emit('fill board', {eventType: 'fill board', color});
         });
 
     });

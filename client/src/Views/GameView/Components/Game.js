@@ -1,6 +1,8 @@
 import { React, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import pencil from '../../../assets/images/pencil.svg';
+
 import GameBoard from './GameBoard.js'
 import Chat from '../Components/ChatView/ChatContainer';
 import {
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     gameBoardPen: {
-        backgroundImage: 'url(https://maps.gstatic.com/mapfiles/santatracker/v201912242254/scenes/speedsketch/img/pen.svg);',
+        backgroundImage: `url(${pencil})`,
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',
@@ -101,6 +103,7 @@ const Game = ({socket}) => {
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
     const router = useHistory();
+    const [displayPen, setDisplayPen] = useState(false);
     const [words, setWords] = useState([]);
     const [chooseWords, setChooseWords] = useState([]);
     const [turnStarted, setTurnStarted] = useState(false);
@@ -160,6 +163,10 @@ const Game = ({socket}) => {
         }
     }, []);
 
+    useEffect(() => {
+        console.log('display pen')
+    }, [setDisplayPen, displayPen])
+
     function handleNewGuess(data) {
         let newWord = {name: data.name, word: data.word, isCorrect: data.isCorrect};
         setWords(oldWords => [...oldWords, newWord]);
@@ -191,8 +198,8 @@ const Game = ({socket}) => {
 
     return (
         <div className={classes.root} >
-            <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
-            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
+            {displayPen && <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>}
+            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => displayPen && onPenMove(e)}>
                 <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
@@ -206,7 +213,7 @@ const Game = ({socket}) => {
                         </Paper>
                     </div>
                     <div className={classes.game} >
-                        <GameBoard socket={socket} />
+                        <GameBoard socket={socket} setDisplayPen={setDisplayPen}/>
                         {!turnStarted && <div className={classes.wordPicker}>
                             <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word"}</h1>
                             { isYourTurn && <div className={classes.wordGrid}>
