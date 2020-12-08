@@ -215,8 +215,7 @@ async function startTurn(io, socket, userId, roomId, data) {
     }
 }
 
-// Ends the current turn. Checks if the round is over (all players have drawn).
-// If so, end the round.
+// Ends the current turn. Checks if the round is over (all players have drawn). If so, end the round.
 async function endTurn(io, roomId, game) {
 
     try {
@@ -271,8 +270,7 @@ async function endRound(io, roomId, game) {
         round++;
         
         if (round > game.TotalRounds) {
-            // TODO: add top 3 scores;
-            io.to(roomId).emit('game over');
+            endGame(io, roomId, game);
             return;
         }
 
@@ -297,6 +295,20 @@ async function endRound(io, roomId, game) {
     }
 }
 
+async function endGame(io, roomId, game) {
+    // clear interval if it is still going
+    let timer = Timers[roomId];
+
+    if (timer !== undefined) {
+        clearInterval(timer);
+        delete Timers[roomId];
+    }
+    // TODO: add top 3 scores;
+    io.to(roomId).emit('game over');
+
+    await Game.deleteOne({RoomId: mongoose.Types.ObjectId(roomId)});
+}
+
 // Connection Methods
 
 async function userHasDisconnected(io, userId, roomId) {
@@ -313,12 +325,28 @@ async function userHasDisconnected(io, userId, roomId) {
             { $pull: { Players: {_id: userId} }},
         );
 
+        try {
+            let game = await Game.findOne({RoomId: roomId});
+
+            if (game !== null) {
+                // if one player left, end the game
+                if (game.Players.length <= 1) {
+                    endGame(io, roomId, game);
+                }
+                // if player who left was drawing, end the turn
+                else if (game.CurrentTurn.toString() == userId) {
+                    endTurn(io, roomId, game)
+                }
+            }
+        } catch(error) {
+            console.log(error);
+        }
+
         let room = await Room.findOne({_id: mongoose.Types.ObjectId(roomId)});
         
         // if no more users, close the room & the game if it exists
         if (room.UserIds.length == 0){
             await Room.deleteOne({_id: mongoose.Types.ObjectId(roomId)});
-            await Game.deleteOne({RoomId: mongoose.Types.ObjectId(roomId)});
         }
 
         // if the user was the host, update the host to a new user (first in the array)
