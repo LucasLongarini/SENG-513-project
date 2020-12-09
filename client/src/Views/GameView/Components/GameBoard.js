@@ -36,6 +36,7 @@ const GameBoard = ({socket, setDisplayPen}) => {
     const canvasRef = useRef(null);
     const [activeColor, setActiveColor] = useState('#000000');
     const [penSize, setPenSize] = useState(5);
+    const [penType, setPenType] = useState('pen');
     const [isClearingBoard, setisClearingBoard] = useState(false);
 
     let context;
@@ -144,7 +145,7 @@ const GameBoard = ({socket, setDisplayPen}) => {
         
             // window.removeEventListener('resize', onResize, false);
         }
-    }, [penSize, setPenSize, activeColor, setActiveColor]);
+    }, [penSize, setPenSize, activeColor, setActiveColor, penType, setPenType]);
 
     function readFromQueue(waitTime) {
         let item = queue.dequeue();
@@ -193,6 +194,10 @@ const GameBoard = ({socket, setDisplayPen}) => {
     }
 
     const drawLine = (x0, y0, x1, y1, color, emit) => {
+        if (penType === 'fill') {
+            fillBoard(emit)
+            return;
+        }
         const canvas = canvasRef.current;
         const w = canvas.width;
         const h = canvas.height;
@@ -325,6 +330,8 @@ const GameBoard = ({socket, setDisplayPen}) => {
                 setActiveColor={setActiveColor}
                 fillBoard={fillBoard}
                 clearBoard={clearBoard}
+                penType={penType} 
+                setPenType={setPenType}
             />
         </div>
     );

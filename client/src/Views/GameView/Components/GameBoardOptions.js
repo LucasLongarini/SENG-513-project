@@ -1,4 +1,4 @@
-import { React, useRef, useEffect, useState, Fragment } from 'react';
+import { React, useEffect, useState, Fragment } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Clear, Lens, FormatColorFill, Palette, ClearAll } from '@material-ui/icons';
 import {
@@ -21,7 +21,8 @@ const useStyles = makeStyles((theme) => ({
         bottom: '12px',
         display: 'flex',
         height: '20%',
-        left: '90%',
+        // left: '90%',
+        right: '2%',
         position: 'absolute',
     },
     penSizeOptionsContainer: {
@@ -69,6 +70,8 @@ const GameBoardOptions = (props) => {
         setActiveColor,
         clearBoard,
         fillBoard,
+        penType,
+        setPenType,
     } = props;
 
     useEffect(() => {
@@ -77,23 +80,58 @@ const GameBoardOptions = (props) => {
     const handleClick = (option) => (event) => {
         setMenuContent(option)
         setAnchorEl(event.currentTarget);
-        option === 'pen' ? (setOpenPenPopper(!openPenPopper) && setOpenColorPopper(false)) : (setOpenColorPopper(!openColorPopper) && setOpenPenPopper(false));     
+        if (option === 'pen') {
+            setOpenPenPopper(!openPenPopper);
+            setOpenColorPopper(false);
+        } else {
+            setOpenColorPopper(!openColorPopper);
+            setOpenPenPopper(false);
+        }
     };
 
     const handleColorChangeComplete = (color) => {
         setActiveColor(color.hex)
       };
 
+    const handlePenOptionClick = (optionType) => {
+        switch(optionType) {
+            case 'small': {
+                setPenType('pen');
+                setPenSize(SMALL_PEN_SIZE);
+                break;
+            }
+            case 'default': {
+                setPenType('pen');
+                setPenSize(MEDIUM_PEN_SIZE);
+                break;
+            }
+            case 'large': {
+                setPenType('pen');
+                setPenSize(LARGE_PEN_SIZE);
+                break;
+            }
+            case 'fill': {
+                setPenType('fill')
+                break;
+            }
+            case 'erase': {
+                setPenType('pen');
+                setActiveColor('#FFFFFF')
+                break;
+            }
+        }
+    }
+
     const getMenuContent = () => {
         switch(menuContent){
             case 'pen': {
                 return (
                     <div className={classes.penSizeOptions}>
-                        <Lens className={classes.penSize} color='secondary' fontSize='small' onClick={() => setPenSize(SMALL_PEN_SIZE)}/>
-                        <Lens className={classes.penSize} color='secondary' fontSize='default' onClick={() => setPenSize(MEDIUM_PEN_SIZE)}/>
-                        <Lens className={classes.penSize} color='secondary' fontSize='large' onClick={() => setPenSize(LARGE_PEN_SIZE)}/>
-                        <FormatColorFill className={classes.penSize} color='secondary' fontSize='large' onClick={() => fillBoard(true)}/>
-                        <ClearAll className={classes.penSize} color='secondary' fontSize='large' onClick={() => setActiveColor('#FFFFFF')}/>
+                        <Lens className={classes.penSize} color='secondary' fontSize='small' onClick={() =>  handlePenOptionClick('small')}/>
+                        <Lens className={classes.penSize} color='secondary' fontSize='default' onClick={() => handlePenOptionClick('default')}/>
+                        <Lens className={classes.penSize} color='secondary' fontSize='large' onClick={() => handlePenOptionClick('large')}/>
+                        <FormatColorFill className={classes.penSize} color='secondary' fontSize='large' onClick={() => handlePenOptionClick('fill')}/>
+                        <ClearAll className={classes.penSize} color='secondary' fontSize='large' onClick={() => handlePenOptionClick('erase')}/>
                     </div>
                 )
             }
@@ -136,9 +174,11 @@ const GameBoardOptions = (props) => {
                 <Clear color='secondary' fontSize='large' onClick={() => clearBoard(true)}/>
             </div>
         </div>
-        <div className={classes.clearOptionContainer}>
-            <Clear color='secondary' fontSize='large' onClick={() => clearBoard(true)}/>
-        </div>
+        { false &&        
+            <div className={classes.clearOptionContainer}>
+                <Clear color='secondary' fontSize='large' onClick={() => clearBoard(true)}/>
+            </div>
+        }
         </Fragment>
     );
 }

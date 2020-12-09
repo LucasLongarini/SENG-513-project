@@ -164,7 +164,6 @@ const Game = ({socket}) => {
     }, []);
 
     useEffect(() => {
-        console.log('display pen')
     }, [setDisplayPen, displayPen])
 
     function handleNewGuess(data) {
