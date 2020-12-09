@@ -108,7 +108,7 @@ async function newWord(io, word, timeLeft, userId, roomId, userName) {
         });
 
         // update drawer score for every correct guess
-        let drawerScore = Math.floor((1000 / (nPlayers - 1))/100)*100 
+        let drawerScore = Math.floor(((roundWordDifficulty/3)*1000 / (nPlayers - 1))/100)*100 
         await Game.updateOne({ 'Players._id': currentTurn}, {
             $inc: {'Players.$.Score': drawerScore}
         });
@@ -210,10 +210,12 @@ async function startTurn(io, socket, userId, roomId, data) {
 
         // broadcast to all sockets the a turn is starting
         socket.broadcast.to(roomId).emit('turn started', {
+            totalRounds: game.TotalRounds,
             round: game.CurrentRound,
             wordHint:  wordGenerator.convertWordToHint(data.word),
         });
         io.to(socket.id).emit('turn started', {
+            totalRounds: game.TotalRounds,
             round: game.CurrentRound,
             wordHint: data.word,
         });

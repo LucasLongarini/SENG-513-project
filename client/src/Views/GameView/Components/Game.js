@@ -110,13 +110,16 @@ const Game = ({socket, handlePlayAgain}) => {
     const [turnEnded, setTurnEnded] = useState(false);
     const [correctWord, setCorrectWord] = useState("");
     const [timer, setTimer] = useState(0);
-    const [round, setRound] = useState(1);
+    const [round, setRound] = useState("");
     const [wordHint, setWordHint] = useState("");
     const [isGameOver, setIsGameOver] = useState(false);
     const [topUsers, setTopUsers] = useState([]);
-    const animationProps = useSpring({
-        from: {opacity: 0},
-        to: {opacity: 1}
+    const turnEndedAnimation = useSpring({
+        opacity: turnEnded ? 1 : 0
+    });
+    const turnStartedAnimation = useSpring({
+        from: {opacity: !turnEnded ? 0 : 1},
+        to: {opacity: !turnEnded ? 1 : 0}
     });
     const correctWordSound = new Howl({src: correctWordSrc});
     const turnStartSound = new Howl({src: turnStartSrc});
@@ -148,7 +151,7 @@ const Game = ({socket, handlePlayAgain}) => {
             socket.on('turn started', (data) => {
                 turnStartSound.play();
                 setWords([]);
-                setRound(data.round);
+                setRound(`${data.round} of ${data.totalRounds}`);
                 setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);
                 setTurnEnded(false);
@@ -221,7 +224,9 @@ const Game = ({socket, handlePlayAgain}) => {
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
                             <Grid container className={classes.gameHeader}>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Round: ${round}`}</Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>
+                                    <h2 style={{fontWeight: 500}}>{`Round: ${round}`}</h2>
+                                </Grid>
                                 <Grid item xs={1} sm={6}>
                                     <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
                                 </Grid>
@@ -231,25 +236,29 @@ const Game = ({socket, handlePlayAgain}) => {
                     </div>
                     <div className={classes.game} >
                         <GameBoard socket={socket} />
-                        {!turnStarted && <div className={classes.wordPicker}>
-                            <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word"}</h1>
-                            { isYourTurn && <div className={classes.wordGrid}>
-                                {chooseWords && chooseWords.map((word, index) => {
-                                    return <Button key={index} onClick={() => handleWordSelection(word.word, word.difficulty)} 
-                                        variant="contained">{word.word}</Button>
-                                })}
-                            </div>}
-                        </div>}
+                        {!turnStarted && 
+                            <animated.div style={turnStartedAnimation}>
+                                <div className={classes.wordPicker}>
+                                    <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word..."}</h1>
+                                    { isYourTurn && <div className={classes.wordGrid}>
+                                        {chooseWords && chooseWords.map((word, index) => {
+                                            return <Button key={index} onClick={() => handleWordSelection(word.word, word.difficulty)} 
+                                                variant="contained">{word.word}</Button>
+                                        })}
+                                    </div>}
+                                </div>
+                            </animated.div> 
+                        }
                         { turnEnded && 
-                            <div className={classes.wordPicker}>
-                                <animated.div style={animationProps}>
+                            <animated.div style={turnEndedAnimation}>
+                                <div className={classes.wordPicker}>
                                     <h1>{"Turn over"}</h1>
                                     <h2>
                                         <span style={{fontWeight: 400}}>The Correct word was: </span>
                                         {correctWord}
                                     </h2>
-                                </animated.div>
-                            </div>
+                                </div>
+                            </animated.div> 
                         }
                     </div>
                 </Grid>
