@@ -173,8 +173,9 @@ async function startGame(io, socket, userId, roomId) {
 }
 
 // sends events to the socket whos turn it is and asks them to pick a word
-function switchTurns(io, socketId, userId, roomId) {
-    io.to(socketId).emit('start your turn', wordGenerator.generateWords());
+async function switchTurns(io, socketId, userId, roomId) {
+    let words = await wordGenerator.generateWords();
+    io.to(socketId).emit('start your turn', words);
     io.to(roomId).emit('switch turns', {
         userId: userId
     });

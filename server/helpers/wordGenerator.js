@@ -1,9 +1,24 @@
-const sentencer = require('sentencer');
+const nthline = require('nthline');
+const easyFile = './words/easy.txt';
+const mediumFile = './words/medium.txt';
+const hardFile = './words/hard.txt';
 
-module.exports.generateWords = function() {
-    var easy = sentencer.make("{{ noun }}");
-    var medium = sentencer.make("{{ noun }}");
-    var hard = sentencer.make("{{ adjective }}");
+module.exports.generateWords = async function() {
+
+    // returns a random integer from 0 to 149
+    let easyIndex = Math.floor(Math.random() * 150);      
+    let mediumIndex = Math.floor(Math.random() * 150);      
+    let hardIndex = Math.floor(Math.random() * 150); 
+
+    let easyPromise = nthline(easyIndex, easyFile);
+    let mediumPromise = nthline(mediumIndex, mediumFile);
+    let hardPromise = nthline(hardIndex, hardFile);
+
+    let data = await Promise.all([easyPromise, mediumPromise, hardPromise]);
+
+    var easy = data[0];
+    var medium = data[1];
+    var hard = data[2];
 
     return [
         {
