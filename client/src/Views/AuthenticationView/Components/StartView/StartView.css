@@ -1,3 +1,8 @@
+.logo-container {
+    display: flex;
+    justify-content: flex-start;
+}
+
 .register-text {
     margin-top: 20px;
     color: rgba(0, 0, 0, 0.5);

@@ -1,6 +1,6 @@
 import React from 'react';
 import './StartView.css';
-import Logo from '../../../../assets/images/logo.png';
+import Logo from '../../../../assets/images/logo.svg';
 import Grid from '@material-ui/core/Grid';
 import Views from '../../State/Views';
 
@@ -11,12 +11,8 @@ function StartView(props) {
   return (
     <div>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <img id="authentication-logo" alt="Logo" src={Logo}></img>
-        </Grid>
-
-        <Grid item xs={12}>
-            <div style={{height: 20}}/>
+        <Grid className="logo-container" item xs={12}>
+          <img style={{width: '80%'}} id="authentication-logo" alt="Logo" src={Logo}></img>
         </Grid>
 
         <Grid item xs={12}>
