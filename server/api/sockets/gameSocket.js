@@ -208,11 +208,12 @@ async function startTurn(io, socket, userId, roomId, data) {
             } ,
         );
 
+        let initialWordHint = wordGenerator.convertWordToHint(data.word);
         // broadcast to all sockets the a turn is starting
         socket.broadcast.to(roomId).emit('turn started', {
             totalRounds: game.TotalRounds,
             round: game.CurrentRound,
-            wordHint:  wordGenerator.convertWordToHint(data.word),
+            wordHint:  initialWordHint,
         });
         io.to(socket.id).emit('turn started', {
             totalRounds: game.TotalRounds,
@@ -222,13 +223,28 @@ async function startTurn(io, socket, userId, roomId, data) {
 
         // create a timer socket for the time
         let timer = game.Timer;
+
+        let wordsToReveal = Math.ceil(data.word.length * 0.5);
+        let wordIncrement = Math.ceil(timer / (wordsToReveal + 1));
+        let updatedWordHint = initialWordHint;
         let timerInterval = setInterval(() => {
             io.to(roomId).emit('timer', timer);
+
             if (timer === 0) {
                 endTurn(io, roomId);
                 clearInterval(timerInterval);
             }
             timer--;
+
+            if ((timer % wordIncrement) === 0 && timer > 0) {
+                let newWordHint = wordGenerator.revealWordHint(data.word, updatedWordHint);
+                updatedWordHint = newWordHint;
+
+                socket.broadcast.to(roomId).emit('word hint update', {
+                    wordHint:  newWordHint,
+                });
+
+            }
         }, 1000);
 
         // set here so it can be cleared elsewere is needed.

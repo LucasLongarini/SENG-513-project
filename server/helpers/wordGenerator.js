@@ -40,3 +40,24 @@ function scaleValue(value, from, to) {
 	var capped = Math.min(from[1], Math.max(from[0], value)) - from[0];
 	return ~~(capped * scale + to[0]);
 }
+
+module.exports.revealWordHint = function(word, wordHint) {
+    let removedWhiteSpace = wordHint.split(' ').join('');
+    let indexes = [];
+    for (let i = 0; i<removedWhiteSpace.length; i++) {
+        if (removedWhiteSpace[i] === '_')
+            indexes.push(i);
+    }
+    
+    // random number between 0 and indexes.length - 1
+    let randomIndex = Math.floor(Math.random() * indexes.length);
+    let characterIndex = indexes[randomIndex];
+    let newWord = removedWhiteSpace.replaceAt(characterIndex, word[characterIndex]);
+
+    // add back white space
+    return newWord.split('').join(' ');
+}
+
+String.prototype.replaceAt = function(index, replacement) {
+    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+}

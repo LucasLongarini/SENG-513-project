@@ -171,7 +171,11 @@ const Game = ({socket, handlePlayAgain}) => {
 
             socket.on('game over', topUsers => {
                 handleGameOver(topUsers);
-            })
+            });
+
+            socket.on('word hint update', data => {
+                setWordHint(data.wordHint);
+            });
         }
     }, []);
 
