@@ -9,6 +9,7 @@ import {
     Button,
 } from '@material-ui/core';
 import { toast } from 'react-toastify';
+import Timer from './Timer/Timer';
 import 'react-toastify/dist/ReactToastify.css';
 import authenticationService from '../../../services/AuthenticationService';
 import {useSpring, animated} from 'react-spring';
@@ -64,11 +65,12 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         textAlign: 'center',
         verticalAlign: 'center',
+        color: '#36363'
     },
     gameHeaderPaper: {
         width: 'auto',
         margin: 'auto',
-        padding: '20px',
+        padding: '10px',
     },
     wordPicker: {
         position: 'absolute',
@@ -92,7 +94,7 @@ const useStyles = makeStyles((theme) => ({
         gridTemplateColumns: '1fr 1fr 1fr'
     },
     wordHint: {
-        whiteSpace: 'break-spaces'
+        whiteSpace: 'break-spaces',
     },
     headerItems: {
         margin: 'auto',
@@ -231,10 +233,12 @@ const Game = ({socket, handlePlayAgain}) => {
                                 <Grid className={classes.headerItems} item xs={1} sm={3}>
                                     <h2 style={{fontWeight: 500}}>{`Round: ${round}`}</h2>
                                 </Grid>
-                                <Grid item xs={1} sm={6}>
+                                <Grid className={classes.headerItems} item xs={1} sm={6}>
                                     <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
                                 </Grid>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Time: ${timer}s`}</Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>
+                                    <Timer time={timer}/>
+                                </Grid>
                             </Grid>
                         </Paper>
                     </div>
