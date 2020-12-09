@@ -2,7 +2,7 @@ import { React, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import pencil from '../../../assets/images/pencil.svg';
-
+import timerIcon from '../../../assets/images/timerIcon.svg';
 import GameBoard from './GameBoard.js'
 import Chat from '../Components/ChatView/ChatContainer';
 import {
@@ -67,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
         width: 'auto',
         margin: 'auto',
         padding: '20px',
+        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
     },
     wordPicker: {
         position: 'absolute',
@@ -207,8 +208,9 @@ const Game = ({socket}) => {
                                 <Grid item xs={1} sm={6}>
                                     <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
                                 </Grid>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Time: ${timer}s`}</Grid>
-                            </Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>                    
+                                    {`Time: ${timer}s`}</Grid>
+                                </Grid>
                         </Paper>
                     </div>
                     <div className={classes.game} >
@@ -232,7 +234,7 @@ const Game = ({socket}) => {
                         }
                     </div>
                 </Grid>
-                <Grid className={classes.gridItem} item xs={2}>
+                <Grid className={classes.gridItem} item xs={2} >
                     <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>

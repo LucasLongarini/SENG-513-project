@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     gameBoardCanvas: {
         backgroundColor: 'white',
         borderRadius: '5px',
-        boxShadow: '15px 15px 0 0 rgba(0,0,0, .2)',
+        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
         userSelect: 'none',
         '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
         '-webkitUserDrag': 'none',
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#999',
         borderRadius: '0 0 12px 12px',
         bottom: '0',
-        boxShadow: '15px 15px 0 0 rgba(0,0,0,.2)',
+        // boxShadow: '4px 4px 0 0 rgba(0,0,0,.2)',
         height: '12px',
         left: '-20px',
         position: 'absolute',
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 const GameBoard = ({socket, setDisplayPen}) => {
     const canvasRef = useRef(null);
     const [activeColor, setActiveColor] = useState('#000000');
-    const [penSize, setPenSize] = useState(5);
+    const [penSize, setPenSize] = useState(25);
     const [penType, setPenType] = useState('pen');
     const [isClearingBoard, setisClearingBoard] = useState(false);
 
@@ -198,6 +198,7 @@ const GameBoard = ({socket, setDisplayPen}) => {
             fillBoard(emit)
             return;
         }
+        const penColor = penType === 'eraser' ? '#FFFFFF' : color;
         const canvas = canvasRef.current;
         const w = canvas.width;
         const h = canvas.height;
@@ -205,11 +206,10 @@ const GameBoard = ({socket, setDisplayPen}) => {
         context.beginPath();
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
-        context.strokeStyle = color;
+        context.strokeStyle = penColor;
         context.lineWidth = penSize;
         context.lineCap = 'round';
         context.stroke();
-        // context.closePath();
   
         if (!emit || !socket) return; // check this
 

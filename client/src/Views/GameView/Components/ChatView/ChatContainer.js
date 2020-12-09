@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         width: '100%',
         height: '100%',
+        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
       },
       chatOutputContainer: {
         overflowY: 'auto',
