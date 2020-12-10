@@ -126,7 +126,6 @@ const Game = ({socket, handlePlayAgain}) => {
     const correctWordSound = new Howl({src: correctWordSrc});
     const turnStartSound = new Howl({src: turnStartSrc});
 
-
     useEffect(() => {
         if (socket !== undefined) {
             socket.on('new guess', handleNewGuess);
@@ -271,7 +270,7 @@ const Game = ({socket, handlePlayAgain}) => {
                     </div>
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2}>
-                    <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
+                    <Chat canType={!isYourTurn && turnStarted} words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>
         

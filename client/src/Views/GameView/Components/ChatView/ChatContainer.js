@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
       }
   }));
 
-function ChatContainer({onNewWord, words, isYourTurn}) {
+function ChatContainer({onNewWord, words, canType}) {
 
   const [word, setWord] = useState("");
   const classes = useStyles();
@@ -56,7 +56,7 @@ function ChatContainer({onNewWord, words, isYourTurn}) {
           }
         </div>
         <div className={classes.chatInputContainer}>
-          { !isYourTurn && <TextField value={word} onKeyDown={handleKeyPressed} 
+          { canType && <TextField value={word} onKeyDown={handleKeyPressed} 
             onChange={v => setWord(v.target.value)}
             size='small' variant='filled' 
             fullWidth label="Type your guess..." />}
