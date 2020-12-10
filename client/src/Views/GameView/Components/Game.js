@@ -1,6 +1,8 @@
 import { React, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import pencil from '../../../assets/images/pencil.svg';
+import timerIcon from '../../../assets/images/timerIcon.svg';
 import GameBoard from './GameBoard.js'
 import Chat from '../Components/ChatView/ChatContainer';
 import {
@@ -17,6 +19,7 @@ import GameOverModal from '../Components/GameOverModal/GameOverModal';
 import {Howl, Howler} from 'howler';
 import correctWordSrc from '../../../assets/sounds/correctWord.mp3';
 import turnStartSrc from '../../../assets/sounds/turnStart.mp3';
+import _ from 'lodash';
 
 toast.configure();
 
@@ -31,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     gameBoardPen: {
-        backgroundImage: 'url(https://maps.gstatic.com/mapfiles/santatracker/v201912242254/scenes/speedsketch/img/pen.svg);',
+        backgroundImage: `url(${pencil})`,
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',
@@ -70,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
     gameHeaderPaper: {
         width: 'auto',
         margin: 'auto',
+        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
         padding: '10px',
     },
     wordPicker: {
@@ -101,10 +105,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Game = ({socket, handlePlayAgain}) => {
+const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     Howler.volume(0.8);
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
+    const router = useHistory();
+    const [displayPen, setDisplayPen] = useState(false);
     const [words, setWords] = useState([]);
     const [chooseWords, setChooseWords] = useState([]);
     const [turnStarted, setTurnStarted] = useState(false);
@@ -116,6 +122,8 @@ const Game = ({socket, handlePlayAgain}) => {
     const [wordHint, setWordHint] = useState("");
     const [isGameOver, setIsGameOver] = useState(false);
     const [topUsers, setTopUsers] = useState([]);
+    const [missSpelledWords, setMissSpelledWords] = useState([]);
+    const [suggetions, setSuggetions] = useState({});
     const turnEndedAnimation = useSpring({
         opacity: turnEnded ? 1 : 0
     });
@@ -178,9 +186,17 @@ const Game = ({socket, handlePlayAgain}) => {
             socket.on('word hint update', data => {
                 setWordHint(data.wordHint);
             });
+
+            socket.on('spelling checked', data => {
+                setMissSpelledWords(data.missSpelledWords);
+                setSuggetions(data.suggestions);
+            })
         }
     }, []);
 
+    useEffect(() => {
+    }, [setDisplayPen, displayPen])
+    
     function handleGameOver(topUsers) {
         setTopUsers(topUsers);
         setIsGameOver(true);
@@ -197,6 +213,14 @@ const Game = ({socket, handlePlayAgain}) => {
     const onPenMove = (e) => {
         gameBoardPenRef.current.style.left = `${e.pageX}px`;
         gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
+    }
+
+    const handleKeyDown = (word) => {
+        if (_.get(word, 'length') > 0) {
+            socket.emit('spell check', {
+                corpus: word,
+            });
+        }
     }
 
     function handleSendWord(word) {
@@ -224,8 +248,8 @@ const Game = ({socket, handlePlayAgain}) => {
 
     return (
         <div className={classes.root} >
-            <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>
-            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => onPenMove(e)}>
+            {displayPen && <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>}
+            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => displayPen && onPenMove(e)}>
                 <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
@@ -243,7 +267,7 @@ const Game = ({socket, handlePlayAgain}) => {
                         </Paper>
                     </div>
                     <div className={classes.game} >
-                        <GameBoard socket={socket} />
+                        <GameBoard socket={socket} setDisplayPen={setDisplayPen} isYourTurn={isYourTurn}/>
                         {!turnStarted && 
                             <animated.div style={turnStartedAnimation}>
                                 <div className={classes.wordPicker}>
@@ -270,8 +294,18 @@ const Game = ({socket, handlePlayAgain}) => {
                         }
                     </div>
                 </Grid>
-                <Grid className={classes.gridItem} item xs={2}>
-                    <Chat canType={!isYourTurn && turnStarted} words={words} onNewWord={handleSendWord}/>
+                <Grid className={classes.gridItem} item xs={2} >
+                    <Chat 
+                        isYourTurn={isYourTurn} 
+                        words={words} 
+                        onNewWord={handleSendWord} 
+                        isSpellCheck={isSpellCheck} 
+                        onKeyDown={handleKeyDown}
+                        setMissSpelledWords={setMissSpelledWords}
+                        missSpelledWords={missSpelledWords}
+                        setSuggetions={setSuggetions}
+                        suggetions={suggetions}
+                    />
                 </Grid>
             </Grid>
         

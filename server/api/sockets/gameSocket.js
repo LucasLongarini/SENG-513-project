@@ -1,6 +1,7 @@
 const jwt = require ('jsonwebtoken');
 const mongoose = require('mongoose'); 
 const wordGenerator = require('../../helpers/wordGenerator');
+const spellChecker = require ('spellchecker');
 const Room = require('../../models/Room');
 const User = require('../../models/User');
 const Game = require('../../models/Game');
@@ -58,11 +59,22 @@ module.exports = function(io) {
             newWord(io, data.word, data.timeLeft, userId, roomId, userName);
         });
 
-        // Drawing events
-        socket.on('drawing1', drawingData => {
-            socket.broadcast.to(roomId).emit('drawing', drawingData);
+        socket.on('spell check', data => {
+            spellCheck(socket, data.corpus);
         });
 
+        // Drawing events
+        socket.on('drawing1', drawingData => {
+            socket.broadcast.to(roomId).emit('drawing', { ...drawingData, eventType: 'drawing'});
+        });
+
+        socket.on('clear', () => {
+            socket.broadcast.to(roomId).emit('clear board', {eventType: 'clear board'});
+        });
+
+        socket.on('fill', color => {
+            socket.broadcast.to(roomId).emit('fill board', {eventType: 'fill board', color});
+        });
     });
 }
 
@@ -133,6 +145,35 @@ async function newWord(io, word, timeLeft, userId, roomId, userName) {
     else {
         io.to(roomId).emit('new guess', {name: userName, word: word, isCorrect: false});
     }
+}
+
+async function spellCheck(socket, corpus) {
+    const missSpelledWord = spellChecker.checkSpelling(corpus)
+    if (missSpelledWord.length === 0) {
+        socket.emit('spelling checked', {
+            isMissSpelled: false,
+            suggestions: [],
+        });
+        return;
+    }
+    let missSpelledWords = [];
+    let suggestions = {};
+    for (let i = 0; i < missSpelledWord.length; i = i + 1) {
+        let word = '';
+        for (let j = missSpelledWord[i].start; j < missSpelledWord[i].end; j = j + 1) {
+            word += corpus[j];
+        }
+        missSpelledWords.push(word)
+        suggestions = {
+            ...suggestions,
+            [`${i}`]: spellChecker.getCorrectionsForMisspelling(word),
+        }
+    }
+
+    socket.emit('spelling checked', {
+        missSpelledWords,
+        suggestions,
+    });
 }
 
 // starts a game and sets initial state

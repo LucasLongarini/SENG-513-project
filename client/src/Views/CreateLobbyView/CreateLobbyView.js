@@ -79,6 +79,7 @@ function CreateLobbyView() {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [timer, setTimer] = useState("-");
   const [rounds, setRounds] = useState("-");
+  const [isSpellCheck, setIsSpellCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
@@ -105,6 +106,7 @@ function CreateLobbyView() {
         setHostId(response.data.room.hostId);
         setTimer(response.data.room.timer);
         setRounds(response.data.room.rounds);
+        setIsSpellCheck(response.data.room.isSpellCheck)
         
         if (response.data.room.isHost)
           connectToRoom();
@@ -154,6 +156,10 @@ function CreateLobbyView() {
         socket.emit('update room settings', {timer : updatedData.timer});
       }
 
+      
+      if (updatedData.isSpellCheck !== undefined && socket !== undefined) {
+        socket.emit('update room settings', {isSpellCheck : updatedData.isSpellCheck});
+      }
 
       await Axios.patch(`/room/${roomId}`, updatedData, {
         headers: {
@@ -229,6 +235,9 @@ function CreateLobbyView() {
       }
       if (data.rounds !== undefined) {
         setRounds(data.rounds);
+      }
+      if (data.isSpellCheck !== undefined) {
+        setIsSpellCheck(data.isSpellCheck);
       }
     });
     socket.on('scores', scores => {
@@ -333,6 +342,7 @@ function CreateLobbyView() {
                   roomId={roomId}
                   socket={socket}
                   handlePlayAgain={resetGame}
+                  isSpellCheck={isSpellCheck}
                 />
               }
             </Grid>

@@ -25,6 +25,7 @@
     "mongoose": "^5.10.15",
     "nodemon": "^2.0.6",
     "nthline": "^1.0.2",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "spellchecker": "^3.7.1"
   }
 }
