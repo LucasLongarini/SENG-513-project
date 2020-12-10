@@ -132,6 +132,7 @@ const Game = ({socket, handlePlayAgain}) => {
 
             // your turn has started
             socket.on('start your turn', words => {
+                setWords([]);
                 setIsYourTurn(true);
                 setTurnEnded(false);
                 setTurnStarted(false);
@@ -142,6 +143,7 @@ const Game = ({socket, handlePlayAgain}) => {
             socket.on('switch turns', data => {
                 let id = authenticationService.getId();
                 if (id !== data.userId) {
+                    setWords([]);
                     setIsYourTurn(false);
                     setTurnEnded(false);
                     setTurnStarted(false);
@@ -151,7 +153,6 @@ const Game = ({socket, handlePlayAgain}) => {
             // a new players turn started
             socket.on('turn started', (data) => {
                 turnStartSound.play();
-                setWords([]);
                 setRound(`${data.round} of ${data.totalRounds}`);
                 setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);

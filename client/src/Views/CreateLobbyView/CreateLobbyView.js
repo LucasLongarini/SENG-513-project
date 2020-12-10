@@ -208,6 +208,7 @@ function CreateLobbyView() {
       setIsGameStarted(true);
     });
     socket.on('switch turns', data => {
+      setCorrectUserIds([]);
       setDrawingUserId(data.userId);
     });
     socket.on('correct guess', userId => {
@@ -229,9 +230,6 @@ function CreateLobbyView() {
       if (data.rounds !== undefined) {
         setRounds(data.rounds);
       }
-    });
-    socket.on('turn started', () => {
-      setCorrectUserIds([]);
     });
     socket.on('scores', scores => {
       handleNewScores(scores);
