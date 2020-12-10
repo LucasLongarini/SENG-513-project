@@ -252,7 +252,7 @@ const Game = ({socket, handlePlayAgain}) => {
                         </Paper>
                     </div>
                     <div className={classes.game} >
-                        <GameBoard socket={socket} />
+                        <GameBoard socket={socket} setDisplayPen={setDisplayPen}/>
                         {!turnStarted && 
                             <animated.div style={turnStartedAnimation}>
                                 <div className={classes.wordPicker}>

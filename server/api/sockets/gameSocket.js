@@ -70,7 +70,6 @@ module.exports = function(io) {
         socket.on('fill', color => {
             socket.broadcast.to(roomId).emit('fill board', {eventType: 'fill board', color});
         });
-
     });
 }
 

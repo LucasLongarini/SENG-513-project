@@ -79,6 +79,7 @@ function CreateLobbyView() {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [timer, setTimer] = useState("-");
   const [rounds, setRounds] = useState("-");
+  const [spellCheck, setSpellCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
