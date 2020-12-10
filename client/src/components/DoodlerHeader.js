@@ -4,7 +4,7 @@ import {
     Paper,
     Grid,
 } from '@material-ui/core';
-import Logo from '../assets/images/logo.png';
+import Logo from '../assets/images/logo.svg';
 
 const useStyles = makeStyles((theme) => ({
   root: {

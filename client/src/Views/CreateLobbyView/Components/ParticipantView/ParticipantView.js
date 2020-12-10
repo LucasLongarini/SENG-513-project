@@ -7,7 +7,7 @@ import {
   Button,
 } from '@material-ui/core';
 
-function ParticipantView({handleInviteLink, users, hostId, drawingUserId, correctUserIds}) {
+function ParticipantView({isGame, scores, handleInviteLink, users, hostId, drawingUserId, correctUserIds}) {
 
   function getJoinedUsers() {
     let userList = [];
@@ -26,11 +26,19 @@ function ParticipantView({handleInviteLink, users, hostId, drawingUserId, correc
         if (correctUserIds && correctUserIds.find(i => i === user.id))
           isCorrect = true;
 
+        let score = isGame ? 0 : undefined;
+        if (scores !== undefined) {
+          let found = scores.find(s => s.id === user.id);
+          if (found !== undefined && found !== null)
+            score = found.score;
+        }
+
         userList.push(<JoinedUser 
           isCorrect={isCorrect} 
           isDrawing={isDrawing} 
           key={i} 
           isVisible={true} 
+          score={score}
           isHost={isHost} 
           emojiId={user.emojiId} 
           name={user.name}/>);

@@ -1,7 +1,7 @@
 import { React, useState, useRef } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { TextField, Grid, IconButton } from '@material-ui/core';
-import Logo from '../../../../assets/images/logo.png';
+import Logo from '../../../../assets/images/logo.svg';
 import Views from '../../State/Views';
 import DisplayIconPicker from '../DisplayIconPicker/DisplayIconPicker';
 import Emojis from '../../../../assets/images/DisplayEmojis/DisplayEmojis';

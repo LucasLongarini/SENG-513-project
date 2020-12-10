@@ -54,8 +54,8 @@ module.exports = function(io) {
             startTurn(io, socket, userId, roomId, data);
         });
 
-        socket.on('send word', word => {
-            newWord(io, socket, word, userId, roomId, userName);
+        socket.on('send word', data => {
+            newWord(io, data.word, data.timeLeft, userId, roomId, userName);
         });
 
         // Drawing events
@@ -88,13 +88,16 @@ async function getGameState(socket, roomId) {
 }
 
 // checks if word is correct. If it is, marks the player and checks if all players have guessed correctly
-async function newWord(io, socket, word, userId, roomId, userName) {
+async function newWord(io, word, timeLeft, userId, roomId, userName) {
     let game = await Game.findOne({RoomId: roomId});
     if (game === null)
         return;
     
     let roundWord = game.RoundWord;
     let roundWordDifficulty = game.RoundWordDifficulty;
+    let maxTimer = game.Timer;
+    let currentTurn = game.CurrentTurn;
+    let nPlayers = game.Players.length;
 
     //round has not started;
     if (roundWord === "")
@@ -104,8 +107,18 @@ async function newWord(io, socket, word, userId, roomId, userName) {
         io.to(roomId).emit('new guess', {name: userName, word: undefined, isCorrect: true});
         io.to(roomId).emit('correct guess', userId);
 
+        let score = roundWordDifficulty * timeLeft;
+        score = wordGenerator.getScore(score, maxTimer);
+    
         await Game.updateOne({ 'Players._id': mongoose.Types.ObjectId(userId)},{
             $set: {'Players.$.HasGuessedCorrectly': true},
+            $inc: {'Players.$.Score': score}
+        });
+
+        // update drawer score for every correct guess
+        let drawerScore = Math.floor(((roundWordDifficulty/3)*1000 / (nPlayers - 1))/100)*100 
+        await Game.updateOne({ 'Players._id': currentTurn}, {
+            $inc: {'Players.$.Score': drawerScore}
         });
 
         // check if all players have guessed corretly
@@ -114,6 +127,15 @@ async function newWord(io, socket, word, userId, roomId, userName) {
             endTurn(io, roomId, game);
         }
 
+        // send scores
+        io.to(roomId).emit('scores',
+            game.Players.map(p => {
+                return {
+                    id: p._id,
+                    score: p.Score
+                }
+            }) 
+        );
 
     }
     else {
@@ -159,8 +181,9 @@ async function startGame(io, socket, userId, roomId) {
 }
 
 // sends events to the socket whos turn it is and asks them to pick a word
-function switchTurns(io, socketId, userId, roomId) {
-    io.to(socketId).emit('start your turn', wordGenerator.generateWords());
+async function switchTurns(io, socketId, userId, roomId) {
+    let words = await wordGenerator.generateWords();
+    io.to(socketId).emit('start your turn', words);
     io.to(roomId).emit('switch turns', {
         userId: userId
     });
@@ -194,25 +217,43 @@ async function startTurn(io, socket, userId, roomId, data) {
             } ,
         );
 
+        let initialWordHint = wordGenerator.convertWordToHint(data.word);
         // broadcast to all sockets the a turn is starting
         socket.broadcast.to(roomId).emit('turn started', {
+            totalRounds: game.TotalRounds,
             round: game.CurrentRound,
-            wordHint:  wordGenerator.convertWordToHint(data.word),
+            wordHint:  initialWordHint,
         });
         io.to(socket.id).emit('turn started', {
+            totalRounds: game.TotalRounds,
             round: game.CurrentRound,
             wordHint: data.word,
         });
 
         // create a timer socket for the time
         let timer = game.Timer;
+
+        let wordsToReveal = Math.ceil(data.word.length * 0.5);
+        let wordIncrement = Math.ceil(timer / (wordsToReveal + 1));
+        let updatedWordHint = initialWordHint;
         let timerInterval = setInterval(() => {
             io.to(roomId).emit('timer', timer);
+
             if (timer === 0) {
                 endTurn(io, roomId);
                 clearInterval(timerInterval);
             }
             timer--;
+
+            if ((timer % wordIncrement) === 0 && timer > 0) {
+                let newWordHint = wordGenerator.revealWordHint(data.word, updatedWordHint);
+                updatedWordHint = newWordHint;
+
+                socket.broadcast.to(roomId).emit('word hint update', {
+                    wordHint:  newWordHint,
+                });
+
+            }
         }, 1000);
 
         // set here so it can be cleared elsewere is needed.
@@ -223,8 +264,7 @@ async function startTurn(io, socket, userId, roomId, data) {
     }
 }
 
-// Ends the current turn. Checks if the round is over (all players have drawn).
-// If so, end the round.
+// Ends the current turn. Checks if the round is over (all players have drawn). If so, end the round.
 async function endTurn(io, roomId, game) {
 
     try {
@@ -279,8 +319,7 @@ async function endRound(io, roomId, game) {
         round++;
         
         if (round > game.TotalRounds) {
-            // TODO: add top 3 scores;
-            io.to(roomId).emit('game over');
+            endGame(io, roomId, game);
             return;
         }
 
@@ -305,6 +344,35 @@ async function endRound(io, roomId, game) {
     }
 }
 
+async function endGame(io, roomId, game) {
+    // clear interval if it is still going
+    let timer = Timers[roomId];
+
+    if (timer !== undefined) {
+        clearInterval(timer);
+        delete Timers[roomId];
+    }
+    
+    let players = game.Players;
+    players.sort((a,b) => b.Score - a.Score);
+    let topPlayers = players.slice(0,3);
+    // get players
+    let users = await User.find({
+        _id: { $in: topPlayers.map(i => i._id)}
+    },
+    '_id Name EmojiId');
+
+    io.to(roomId).emit('game over', topPlayers.map((x, index) => {
+        return {
+            name: users.find(i => i._id.toString() === x._id.toString()).Name,
+            emojiId: users.find(i => i._id.toString() === x._id.toString()).EmojiId,
+            place: index + 1
+        }
+    }));
+
+    await Game.deleteOne({RoomId: mongoose.Types.ObjectId(roomId)});
+}
+
 // Connection Methods
 
 async function userHasDisconnected(io, userId, roomId) {
@@ -321,12 +389,28 @@ async function userHasDisconnected(io, userId, roomId) {
             { $pull: { Players: {_id: userId} }},
         );
 
+        try {
+            let game = await Game.findOne({RoomId: roomId});
+
+            if (game !== null) {
+                // if one player left, end the game
+                if (game.Players.length <= 1) {
+                    endGame(io, roomId, game);
+                }
+                // if player who left was drawing, end the turn
+                else if (game.CurrentTurn.toString() == userId) {
+                    endTurn(io, roomId, game)
+                }
+            }
+        } catch(error) {
+            console.log(error);
+        }
+
         let room = await Room.findOne({_id: mongoose.Types.ObjectId(roomId)});
         
         // if no more users, close the room & the game if it exists
         if (room.UserIds.length == 0){
             await Room.deleteOne({_id: mongoose.Types.ObjectId(roomId)});
-            await Game.deleteOne({RoomId: mongoose.Types.ObjectId(roomId)});
         }
 
         // if the user was the host, update the host to a new user (first in the array)

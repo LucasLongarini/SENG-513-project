@@ -1,0 +1,75 @@
+.GameOverModal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+}
+
+.GameOverModal-content {
+    margin: auto;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 8px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    outline: none;
+    padding: 20px;
+    width: 40%;
+    height: 50%;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    min-height: 400px;
+}
+
+.GameOverModal-container {
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.GameOverModal-places {
+    padding-bottom: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-end;
+    flex: 1;
+}
+
+.GameOverModal-place {
+    width: 25%;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.GameOverModal-place img {
+    width: 30%;
+}
+
+.GameOverModal-podium {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 4px 4px 20px 0 rgba(0, 0, 0, 0.2);
+}
+
+.GameOverModal-place h4 {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+.GameOverModal-place h3 {
+    margin-top: 4px;
+}
+
+.GameOverModal-buttons {
+    display: flex;
+    justify-content: space-around;
+}

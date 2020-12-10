@@ -1,7 +1,7 @@
 import { React, useRef } from 'react';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { IconButton, TextField, Grid } from '@material-ui/core';
-import Logo from '../../../../assets/images/logo.png';
+import Logo from '../../../../assets/images/logo.svg';
 import Views from '../../State/Views';
 import Axios from 'axios';
 import authenticationService from '../../../../services/AuthenticationService';

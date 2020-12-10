@@ -11,9 +11,14 @@ import {
     Button,
 } from '@material-ui/core';
 import { toast } from 'react-toastify';
+import Timer from './Timer/Timer';
 import 'react-toastify/dist/ReactToastify.css';
 import authenticationService from '../../../services/AuthenticationService';
 import {useSpring, animated} from 'react-spring';
+import GameOverModal from '../Components/GameOverModal/GameOverModal';
+import {Howl, Howler} from 'howler';
+import correctWordSrc from '../../../assets/sounds/correctWord.mp3';
+import turnStartSrc from '../../../assets/sounds/turnStart.mp3';
 
 toast.configure();
 
@@ -62,12 +67,13 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         textAlign: 'center',
         verticalAlign: 'center',
+        color: '#36363'
     },
     gameHeaderPaper: {
         width: 'auto',
         margin: 'auto',
-        padding: '20px',
         boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+        padding: '10px',
     },
     wordPicker: {
         position: 'absolute',
@@ -92,15 +98,15 @@ const useStyles = makeStyles((theme) => ({
         gridTemplateColumns: '1fr 1fr 1fr'
     },
     wordHint: {
-        whiteSpace: 'break-spaces'
+        whiteSpace: 'break-spaces',
     },
     headerItems: {
         margin: 'auto',
     },
 }));
 
-const Game = ({socket}) => {
-    
+const Game = ({socket, handlePlayAgain}) => {
+    Howler.volume(0.8);
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
     const router = useHistory();
@@ -112,12 +118,20 @@ const Game = ({socket}) => {
     const [turnEnded, setTurnEnded] = useState(false);
     const [correctWord, setCorrectWord] = useState("");
     const [timer, setTimer] = useState(0);
-    const [round, setRound] = useState(1);
+    const [round, setRound] = useState("");
     const [wordHint, setWordHint] = useState("");
-    const animationProps = useSpring({
-        from: {opacity: 0},
-        to: {opacity: 1}
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [topUsers, setTopUsers] = useState([]);
+    const turnEndedAnimation = useSpring({
+        opacity: turnEnded ? 1 : 0
     });
+    const turnStartedAnimation = useSpring({
+        from: {opacity: !turnEnded ? 0 : 1},
+        to: {opacity: !turnEnded ? 1 : 0}
+    });
+    const correctWordSound = new Howl({src: correctWordSrc});
+    const turnStartSound = new Howl({src: turnStartSrc});
+
 
     useEffect(() => {
         if (socket !== undefined) {
@@ -143,9 +157,10 @@ const Game = ({socket}) => {
 
             // a new players turn started
             socket.on('turn started', (data) => {
+                turnStartSound.play();
                 setWords([]);
-                setRound(data.round);
-                setWordHint(data.wordHint);
+                setRound(`${data.round} of ${data.totalRounds}`);
+                setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);
                 setTurnEnded(false);
             });
@@ -161,13 +176,29 @@ const Game = ({socket}) => {
                 setWordHint("");
                 setTimer(0);
             });
+
+            socket.on('game over', topUsers => {
+                handleGameOver(topUsers);
+            });
+
+            socket.on('word hint update', data => {
+                setWordHint(data.wordHint);
+            });
         }
     }, []);
 
     useEffect(() => {
     }, [setDisplayPen, displayPen])
+    
+    function handleGameOver(topUsers) {
+        setTopUsers(topUsers);
+        setIsGameOver(true);
+    }
 
     function handleNewGuess(data) {
+        if (data.isCorrect) 
+            correctWordSound.play();
+        
         let newWord = {name: data.name, word: data.word, isCorrect: data.isCorrect};
         setWords(oldWords => [...oldWords, newWord]);
     }
@@ -178,8 +209,12 @@ const Game = ({socket}) => {
     }
 
     function handleSendWord(word) {
-        if (word !== undefined && word.length > 0)
-            socket.emit('send word', word);
+        if (word !== undefined && word.length > 0) {
+            socket.emit('send word', {
+                word: word,
+                timeLeft: timer
+            });
+        }
     }
 
     function handleWordSelection(word, difficulty) {
@@ -187,13 +222,13 @@ const Game = ({socket}) => {
             word: word,
             difficulty: difficulty
         });
-        setWordHint(word);
+        setWordHint(word.toUpperCase());
         setChooseWords([]);
     }
 
     function handleTurnEnd(word) {
         setTurnEnded(true);
-        setCorrectWord(word);
+        setCorrectWord(word.toUpperCase());
     }
 
     return (
@@ -204,33 +239,43 @@ const Game = ({socket}) => {
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
                             <Grid container className={classes.gameHeader}>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>{`Round: ${round}`}</Grid>
-                                <Grid item xs={1} sm={6}>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>
+                                    <h2 style={{fontWeight: 500}}>{`Round: ${round}`}</h2>
+                                </Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={6}>
                                     <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
                                 </Grid>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>                    
-                                    {`Time: ${timer}s`}</Grid>
+                                <Grid className={classes.headerItems} item xs={1} sm={3}>
+                                    <Timer time={timer}/>
                                 </Grid>
+                            </Grid>
                         </Paper>
                     </div>
                     <div className={classes.game} >
-                        <GameBoard socket={socket} setDisplayPen={setDisplayPen}/>
-                        {!turnStarted && <div className={classes.wordPicker}>
-                            <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word"}</h1>
-                            { isYourTurn && <div className={classes.wordGrid}>
-                                {chooseWords && chooseWords.map((word, index) => {
-                                    return <Button key={index} onClick={() => handleWordSelection(word.word, word.difficulty)} 
-                                        variant="contained">{word.word}</Button>
-                                })}
-                            </div>}
-                        </div>}
+                        <GameBoard socket={socket} />
+                        {!turnStarted && 
+                            <animated.div style={turnStartedAnimation}>
+                                <div className={classes.wordPicker}>
+                                    <h1>{ isYourTurn ? "Choose a word:" : "Waiting for player to choose a word..."}</h1>
+                                    { isYourTurn && <div className={classes.wordGrid}>
+                                        {chooseWords && chooseWords.map((word, index) => {
+                                            return <Button key={index} onClick={() => handleWordSelection(word.word, word.difficulty)} 
+                                                variant="contained">{word.word}</Button>
+                                        })}
+                                    </div>}
+                                </div>
+                            </animated.div> 
+                        }
                         { turnEnded && 
-                            <div className={classes.wordPicker}>
-                                <animated.div style={animationProps}>
+                            <animated.div style={turnEndedAnimation}>
+                                <div className={classes.wordPicker}>
                                     <h1>{"Turn over"}</h1>
-                                    <h2>{`The correct word was: ${correctWord}`}</h2>
-                                </animated.div>
-                            </div>
+                                    <h2>
+                                        <span style={{fontWeight: 400}}>The Correct word was: </span>
+                                        {correctWord}
+                                    </h2>
+                                </div>
+                            </animated.div> 
                         }
                     </div>
                 </Grid>
@@ -238,6 +283,8 @@ const Game = ({socket}) => {
                     <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
                 </Grid>
             </Grid>
+        
+            <GameOverModal handlePlayAgain={handlePlayAgain} topUsers={topUsers} isOpen={isGameOver} />
         </div>
     );
     

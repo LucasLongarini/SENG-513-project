@@ -18,6 +18,9 @@ import {
   Container,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import {Howl, Howler} from 'howler';
+import joinedSoundSrc from '../../assets/sounds/userJoined.mp3';
+import leftSoundSrc from '../../assets/sounds/userLeft.mp3';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -61,6 +64,7 @@ toast.configure();
 let socket;
 
 function CreateLobbyView() {
+  Howler.volume(0.8);
   const classes = useStyles();
 
   let { roomId } = useParams();
@@ -79,6 +83,9 @@ function CreateLobbyView() {
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
   const [canStartGame, setCanStartGame] = useState(false);
+  const [scores, setScores] = useState([]);
+  const joinedSound = new Howl({src: joinedSoundSrc});
+  const leftSound = new Howl({src: leftSoundSrc});
 
 
   useEffect(() => {
@@ -226,6 +233,13 @@ function CreateLobbyView() {
     socket.on('turn started', () => {
       setCorrectUserIds([]);
     });
+    socket.on('scores', scores => {
+      handleNewScores(scores);
+    });
+  }
+
+  function handleNewScores(scores) {
+    setScores(scores);
   }
 
   function goToGame() {
@@ -233,10 +247,12 @@ function CreateLobbyView() {
   }
 
   function userConnected(user) {
+    joinedSound.play();
     setUsers(oldUsers => [...oldUsers, user]);
   }
 
   function userDisconnected(userId) {
+    leftSound.play();
     setUsers(oldUsers => oldUsers.filter(i => i.id !== userId));
   }
 
@@ -260,6 +276,10 @@ function CreateLobbyView() {
     setIsValidRoom(false);
   }
 
+  function resetGame() {
+    setIsGameStarted(false);
+  }
+
   const createLobbyContent = () => (
     <div className={classes.root}>
       <Container className={classes.container} maxWidth='md'>
@@ -268,7 +288,7 @@ function CreateLobbyView() {
               <DoodleHeader />
             </Grid>
             <Grid item xs={12} md={4} className={classes.customizeViewGridItem}> 
-              <ParticipantView handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+              <ParticipantView isGame={false} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             </Grid>
             <Grid item xs={12} md={8} className={classes.customizeViewGridItem}>
               { isLoading ? 
@@ -307,13 +327,14 @@ function CreateLobbyView() {
               <DoodleHeader />
             </Grid>
             <Grid item xs={2} className={classes.customizeViewGridItem}> 
-              <ParticipantView correctUserIds={correctUserIds} drawingUserId={drawingUserId} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
+              <ParticipantView isGame={true} scores={scores} correctUserIds={correctUserIds} drawingUserId={drawingUserId} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             </Grid>
             <Grid item xs={10} className={classes.customizeViewGridItem}>
               {
                 <GameView
                   roomId={roomId}
                   socket={socket}
+                  handlePlayAgain={resetGame}
                 />
               }
             </Grid>
