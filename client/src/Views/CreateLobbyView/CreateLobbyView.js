@@ -98,7 +98,6 @@ function CreateLobbyView() {
             token: authenticationService.getToken()
           }
         });
-        console.log(response.data.room)
         setIsHost(response.data.room.isHost);
         setRoomSettings(response.data.room);
         setIsPrivateRoom(response.data.room.isPrivate);

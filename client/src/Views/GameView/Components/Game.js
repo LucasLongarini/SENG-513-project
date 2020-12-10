@@ -188,8 +188,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             });
 
             socket.on('spelling checked', data => {
-                console.log('on spelling checked')
-                console.log(data)
                 setMissSpelledWords(data.missSpelledWords);
                 setSuggetions(data.suggestions);
             })
@@ -219,7 +217,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
 
     const handleKeyDown = (word) => {
         if (_.get(word, 'length') > 0) {
-            console.log(word)
             socket.emit('spell check', {
                 corpus: word,
             });

@@ -60,7 +60,6 @@ module.exports = function(io) {
         });
 
         socket.on('spell check', data => {
-            console.log('spell check', data)
             spellCheck(socket, data.corpus);
         });
 
@@ -149,9 +148,7 @@ async function newWord(io, word, timeLeft, userId, roomId, userName) {
 }
 
 async function spellCheck(socket, corpus) {
-    console.log('on spell check')
     const missSpelledWord = spellChecker.checkSpelling(corpus)
-    console.log(missSpelledWord)
     if (missSpelledWord.length === 0) {
         socket.emit('spelling checked', {
             isMissSpelled: false,
@@ -164,19 +161,14 @@ async function spellCheck(socket, corpus) {
     for (let i = 0; i < missSpelledWord.length; i = i + 1) {
         let word = '';
         for (let j = missSpelledWord[i].start; j < missSpelledWord[i].end; j = j + 1) {
-            console.log(corpus[j])
             word += corpus[j];
         }
-        console.log(word)
         missSpelledWords.push(word)
         suggestions = {
             ...suggestions,
             [`${i}`]: spellChecker.getCorrectionsForMisspelling(word),
         }
     }
-
-    console.log(missSpelledWords)
-    console.log(suggestions)
 
     socket.emit('spelling checked', {
         missSpelledWords,

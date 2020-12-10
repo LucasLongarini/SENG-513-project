@@ -152,7 +152,6 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
         const canvas = canvasRef.current;
         const w = canvas.width;
         const h = canvas.height;
-        console.log('on fill')
         
         context = canvas.getContext('2d');
         context.beginPath();
@@ -168,7 +167,6 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
         const canvas = canvasRef.current;
         const w = canvas.width;
         const h = canvas.height;
-        console.log('on clear')
 
         context = canvas.getContext('2d');
         context.clearRect(0, 0, w, h);

@@ -85,9 +85,7 @@ function ChatContainer({
   }
 
   const handleOnChange = (v) => {
-    console.log(v.target.value, isSpellCheck)
     if (isSpellCheck) {
-      console.log('isSpelledChecked')
       onKeyDown(v.target.value)
     }
     setWord(v.target.value)
