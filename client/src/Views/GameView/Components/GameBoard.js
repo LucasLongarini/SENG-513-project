@@ -177,7 +177,7 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
 
     const drawLine = (x0, y0, x1, y1, color, size, emit) => {
         if (penType === 'fill') {
-            floodFill(context, x0, y0, color)
+            fillBoard(emit, color)
             return;
         }
         const penColor = penType === 'eraser' ? '#FFFFFF' : color;
