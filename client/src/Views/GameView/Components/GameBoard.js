@@ -24,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#999',
         borderRadius: '0 0 12px 12px',
         bottom: '0',
-        // boxShadow: '4px 4px 0 0 rgba(0,0,0,.2)',
         height: '12px',
         left: '-20px',
         position: 'absolute',
@@ -32,12 +31,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GameBoard = ({socket, setDisplayPen}) => {
+const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
     const canvasRef = useRef(null);
     const [activeColor, setActiveColor] = useState('#000000');
     const [penSize, setPenSize] = useState(25);
     const [penType, setPenType] = useState('pen');
-    const [isClearingBoard, setisClearingBoard] = useState(false);
+    const [isClearingBoard, setisClearingBoard,] = useState(false);
 
     let context;
     let isDrawing = false;
@@ -65,12 +64,11 @@ const GameBoard = ({socket, setDisplayPen}) => {
     
     const classes = useStyles();
 
-    
     useEffect(() => {
         window.addEventListener('resize', onResize, false);
         onResize();
 
-        if (socket) { // might have to remove this if statement to make updates work
+        if (socket) {
             socket.on('drawing', data => {
                 onDrawingEvent(data);
 
@@ -107,45 +105,33 @@ const GameBoard = ({socket, setDisplayPen}) => {
     useEffect(() => {
         const canvas = canvasRef.current;
         context = canvas.getContext('2d');
-        canvas.addEventListener('mousedown', onMouseDown, false);
-        canvas.addEventListener('mouseup', onMouseUp, false);
-        canvas.addEventListener('mouseout', onMouseUp, false);
-        canvas.addEventListener('mousemove', throttle(onMouseMove, 10), false);
-    
-        canvas.addEventListener('touchstart', onMouseDown, false);
-        canvas.addEventListener('touchend', onMouseUp, false);
-        canvas.addEventListener('touchcancel', onMouseUp, false);
-        canvas.addEventListener('touchmove', throttle(onMouseMove, 10), false);
-    
-        // window.addEventListener('resize', onResize, false);
-        // onResize();
+        if (isYourTurn) {
+            canvas.addEventListener('mousedown', onMouseDown, false);
+            canvas.addEventListener('mouseup', onMouseUp, false);
+            canvas.addEventListener('mouseout', onMouseUp, false);
+            canvas.addEventListener('mousemove', throttle(onMouseMove, 10), false);
         
-        // if (socket) {
-        //     socket.on('drawing', data => {
-        //         onDrawingEvent(data);
-
-        //         if (noDrawingEvents) {
-        //             setTimeout(() => readFromQueue(false), 500);
-        //             noDrawingEvents = false;
-        //         }
-        //     });
-        // }
+            canvas.addEventListener('touchstart', onMouseDown, false);
+            canvas.addEventListener('touchend', onMouseUp, false);
+            canvas.addEventListener('touchcancel', onMouseUp, false);
+            canvas.addEventListener('touchmove', throttle(onMouseMove, 10), false);
+        }
 
         // prevent memory leaks
         return () => {
-            canvas.removeEventListener('mousedown', onMouseDown, false);
-            canvas.removeEventListener('mouseup', onMouseUp, false);
-            canvas.removeEventListener('mouseout', onMouseUp, false);
-            canvas.removeEventListener('mousemove', throttle(onMouseMove, 5), false);
-        
-            canvas.removeEventListener('touchstart', onMouseDown, false);
-            canvas.removeEventListener('touchend', onMouseUp, false);
-            canvas.removeEventListener('touchcancel', onMouseUp, false);
-            canvas.removeEventListener('touchmove', onMouseMove, false);
-        
-            // window.removeEventListener('resize', onResize, false);
+            if (isYourTurn) {           
+                canvas.removeEventListener('mousedown', onMouseDown, false);
+                canvas.removeEventListener('mouseup', onMouseUp, false);
+                canvas.removeEventListener('mouseout', onMouseUp, false);
+                canvas.removeEventListener('mousemove', throttle(onMouseMove, 5), false);
+            
+                canvas.removeEventListener('touchstart', onMouseDown, false);
+                canvas.removeEventListener('touchend', onMouseUp, false);
+                canvas.removeEventListener('touchcancel', onMouseUp, false);
+                canvas.removeEventListener('touchmove', onMouseMove, false);
+            }
         }
-    }, [penSize, setPenSize, activeColor, setActiveColor, penType, setPenType]);
+    }, [penSize, setPenSize, activeColor, setActiveColor, penType, setPenType, isYourTurn]);
 
     function readFromQueue(waitTime) {
         let item = queue.dequeue();
@@ -161,8 +147,6 @@ const GameBoard = ({socket, setDisplayPen}) => {
             noDrawingEvents = true;
         }
     }
-
-    // the problem with the lag is that on the socket request it goes to 
 
     const fillBoard = (emit, color) => {
         const canvas = canvasRef.current;
@@ -193,9 +177,9 @@ const GameBoard = ({socket, setDisplayPen}) => {
         socket.emit('clear');
     }
 
-    const drawLine = (x0, y0, x1, y1, color, emit) => {
+    const drawLine = (x0, y0, x1, y1, color, size, emit) => {
         if (penType === 'fill') {
-            fillBoard(emit)
+            floodFill(context, x0, y0, color)
             return;
         }
         const penColor = penType === 'eraser' ? '#FFFFFF' : color;
@@ -207,11 +191,11 @@ const GameBoard = ({socket, setDisplayPen}) => {
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         context.strokeStyle = penColor;
-        context.lineWidth = penSize;
+        context.lineWidth = size;
         context.lineCap = 'round';
         context.stroke();
   
-        if (!emit || !socket) return; // check this
+        if (!emit || !socket) return;
 
         let difference;
         if (testTime === 0) {
@@ -223,14 +207,14 @@ const GameBoard = ({socket, setDisplayPen}) => {
             difference = time - testTime;
             testTime = time;
         }
-       
         
         socket.emit('drawing1', {
             x0: x0 / w,
             y0: y0 / h,
             x1: x1 / w,
             y1: y1 / h,
-            color,
+            penColor,
+            size,
             time: difference
         });
         
@@ -260,7 +244,7 @@ const GameBoard = ({socket, setDisplayPen}) => {
         if (!isDrawing) {
             return;
         }
-        drawLine(current.X, current.Y, getXCord(e), getYCord(e), activeColor, true);
+        drawLine(current.X, current.Y, getXCord(e), getYCord(e), activeColor, penSize, true);
         current.X = getXCord(e);
         current.Y = getYCord(e);
     };
@@ -270,7 +254,7 @@ const GameBoard = ({socket, setDisplayPen}) => {
             return;
         }
         isDrawing = false;
-        drawLine(current.X, current.Y, getXCord(e), getYCord(e), activeColor, true);
+        drawLine(current.X, current.Y, getXCord(e), getYCord(e), activeColor, penSize, true);
     };
 
     const throttle = (callback, delay) => {
@@ -313,7 +297,7 @@ const GameBoard = ({socket, setDisplayPen}) => {
                 default: {
                     const w = canvas.width;
                     const h = canvas.height;
-                    drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color, false);
+                    drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.penColor, data.size, false);
                 }
             }
         }

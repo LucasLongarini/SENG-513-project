@@ -79,7 +79,7 @@ function CreateLobbyView() {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [timer, setTimer] = useState("-");
   const [rounds, setRounds] = useState("-");
-  const [spellCheck, setSpellCheck] = useState(false);
+  const [isSpellCheck, setIsSpellCheck] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [drawingUserId, setDrawingUserId] = useState("");
   const [correctUserIds, setCorrectUserIds] = useState([]);
@@ -98,6 +98,7 @@ function CreateLobbyView() {
             token: authenticationService.getToken()
           }
         });
+        console.log(response.data.room)
         setIsHost(response.data.room.isHost);
         setRoomSettings(response.data.room);
         setIsPrivateRoom(response.data.room.isPrivate);
@@ -106,6 +107,7 @@ function CreateLobbyView() {
         setHostId(response.data.room.hostId);
         setTimer(response.data.room.timer);
         setRounds(response.data.room.rounds);
+        setIsSpellCheck(response.data.room.isSpellCheck)
         
         if (response.data.room.isHost)
           connectToRoom();
@@ -155,6 +157,10 @@ function CreateLobbyView() {
         socket.emit('update room settings', {timer : updatedData.timer});
       }
 
+      
+      if (updatedData.isSpellCheck !== undefined && socket !== undefined) {
+        socket.emit('update room settings', {isSpellCheck : updatedData.isSpellCheck});
+      }
 
       await Axios.patch(`/room/${roomId}`, updatedData, {
         headers: {
@@ -229,6 +235,9 @@ function CreateLobbyView() {
       }
       if (data.rounds !== undefined) {
         setRounds(data.rounds);
+      }
+      if (data.isSpellCheck !== undefined) {
+        setIsSpellCheck(data.isSpellCheck);
       }
     });
     socket.on('turn started', () => {
@@ -318,9 +327,9 @@ function CreateLobbyView() {
   )
 
   const renderViewContent = () => {
-    // if (!isGameStarted) {
-    //   return createLobbyContent();
-    // }
+    if (!isGameStarted) {
+      return createLobbyContent();
+    }
     return (
       <div className={classes.root}>
         <Grid className={classes.gridContainer} container spacing={3}>
@@ -336,6 +345,7 @@ function CreateLobbyView() {
                   roomId={roomId}
                   socket={socket}
                   handlePlayAgain={resetGame}
+                  isSpellCheck={isSpellCheck}
                 />
               }
             </Grid>

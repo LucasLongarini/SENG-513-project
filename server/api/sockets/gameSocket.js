@@ -1,6 +1,7 @@
 const jwt = require ('jsonwebtoken');
 const mongoose = require('mongoose'); 
 const wordGenerator = require('../../helpers/wordGenerator');
+const spellChecker = require ('spellchecker');
 const Room = require('../../models/Room');
 const User = require('../../models/User');
 const Game = require('../../models/Game');
@@ -56,6 +57,11 @@ module.exports = function(io) {
 
         socket.on('send word', data => {
             newWord(io, data.word, data.timeLeft, userId, roomId, userName);
+        });
+
+        socket.on('spell check', data => {
+            console.log('spell check', data)
+            spellCheck(socket, data.corpus);
         });
 
         // Drawing events
@@ -140,6 +146,42 @@ async function newWord(io, word, timeLeft, userId, roomId, userName) {
     else {
         io.to(roomId).emit('new guess', {name: userName, word: word, isCorrect: false});
     }
+}
+
+async function spellCheck(socket, corpus) {
+    console.log('on spell check')
+    const missSpelledWord = spellChecker.checkSpelling(corpus)
+    console.log(missSpelledWord)
+    if (missSpelledWord.length === 0) {
+        socket.emit('spelling checked', {
+            isMissSpelled: false,
+            suggestions: [],
+        });
+        return;
+    }
+    let missSpelledWords = [];
+    let suggestions = {};
+    for (let i = 0; i < missSpelledWord.length; i = i + 1) {
+        let word = '';
+        for (let j = missSpelledWord[i].start; j < missSpelledWord[i].end; j = j + 1) {
+            console.log(corpus[j])
+            word += corpus[j];
+        }
+        console.log(word)
+        missSpelledWords.push(word)
+        suggestions = {
+            ...suggestions,
+            [`${i}`]: spellChecker.getCorrectionsForMisspelling(word),
+        }
+    }
+
+    console.log(missSpelledWords)
+    console.log(suggestions)
+
+    socket.emit('spelling checked', {
+        missSpelledWords,
+        suggestions,
+    });
 }
 
 // starts a game and sets initial state

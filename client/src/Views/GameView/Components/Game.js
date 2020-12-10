@@ -19,6 +19,7 @@ import GameOverModal from '../Components/GameOverModal/GameOverModal';
 import {Howl, Howler} from 'howler';
 import correctWordSrc from '../../../assets/sounds/correctWord.mp3';
 import turnStartSrc from '../../../assets/sounds/turnStart.mp3';
+import _ from 'lodash';
 
 toast.configure();
 
@@ -89,7 +90,6 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         color: 'white',
         textAlign: 'center',
-        display: 'none', // remove 
     },
     wordGrid: {
         marginTop: '10px',
@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Game = ({socket, handlePlayAgain}) => {
+const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     Howler.volume(0.8);
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
@@ -122,6 +122,8 @@ const Game = ({socket, handlePlayAgain}) => {
     const [wordHint, setWordHint] = useState("");
     const [isGameOver, setIsGameOver] = useState(false);
     const [topUsers, setTopUsers] = useState([]);
+    const [missSpelledWords, setMissSpelledWords] = useState([]);
+    const [suggetions, setSuggetions] = useState({});
     const turnEndedAnimation = useSpring({
         opacity: turnEnded ? 1 : 0
     });
@@ -184,6 +186,13 @@ const Game = ({socket, handlePlayAgain}) => {
             socket.on('word hint update', data => {
                 setWordHint(data.wordHint);
             });
+
+            socket.on('spelling checked', data => {
+                console.log('on spelling checked')
+                console.log(data)
+                setMissSpelledWords(data.missSpelledWords);
+                setSuggetions(data.suggestions);
+            })
         }
     }, []);
 
@@ -206,6 +215,15 @@ const Game = ({socket, handlePlayAgain}) => {
     const onPenMove = (e) => {
         gameBoardPenRef.current.style.left = `${e.pageX}px`;
         gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
+    }
+
+    const handleKeyDown = (word) => {
+        if (_.get(word, 'length') > 0) {
+            console.log(word)
+            socket.emit('spell check', {
+                corpus: word,
+            });
+        }
     }
 
     function handleSendWord(word) {
@@ -252,7 +270,7 @@ const Game = ({socket, handlePlayAgain}) => {
                         </Paper>
                     </div>
                     <div className={classes.game} >
-                        <GameBoard socket={socket} setDisplayPen={setDisplayPen}/>
+                        <GameBoard socket={socket} setDisplayPen={setDisplayPen} isYourTurn={isYourTurn}/>
                         {!turnStarted && 
                             <animated.div style={turnStartedAnimation}>
                                 <div className={classes.wordPicker}>
@@ -280,7 +298,17 @@ const Game = ({socket, handlePlayAgain}) => {
                     </div>
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2} >
-                    <Chat isYourTurn={isYourTurn} words={words} onNewWord={handleSendWord}/>
+                    <Chat 
+                        isYourTurn={isYourTurn} 
+                        words={words} 
+                        onNewWord={handleSendWord} 
+                        isSpellCheck={isSpellCheck} 
+                        onKeyDown={handleKeyDown}
+                        setMissSpelledWords={setMissSpelledWords}
+                        missSpelledWords={missSpelledWords}
+                        setSuggetions={setSuggetions}
+                        suggetions={suggetions}
+                    />
                 </Grid>
             </Grid>
         
