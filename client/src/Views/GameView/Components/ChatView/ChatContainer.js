@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {useState, useEffect } from 'react';
 import { 
     Paper,
     TextField,
@@ -46,7 +46,6 @@ const useStyles = makeStyles((theme) => ({
     },
     word: {
       cursor: 'pointer',
-      // margin: theme.spacing(1),
   },
   }));
 
@@ -64,9 +63,7 @@ function ChatContainer({
   const [word, setWord] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [openPopper, setOpenPopper] = useState(false);
-  const [menuContent, setMenuContent] = useState();
   const classes = useStyles();
-
 
   useEffect(() => {
     if (_.get(missSpelledWords, 'length') > 0) {
@@ -89,7 +86,6 @@ function ChatContainer({
       onKeyDown(v.target.value)
     }
     setWord(v.target.value)
-
   }
 
   const handleSuggestionClick = (newWord) => {
