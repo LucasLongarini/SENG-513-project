@@ -11,10 +11,6 @@ const useStyles = makeStyles((theme) => ({
   disabledButton: {
     color: "white",
   },
-  gridContainer: {
-    width: '100%',
-    height: '100%',
-  },
 }));
 
 function CustomizeView(props) {
@@ -58,17 +54,14 @@ function CustomizeView(props) {
 
   return (
     <div className='CustomizeView-container'>
-      <Grid className={classes.gridContainer} container >
-      <Grid item xs={12} sm={12} >
-        <IconButton style={{
-          maxWidth:"150px", 
-          margin:"8px 0 0 0", 
-          fontSize:"15px"}} 
-          onClick={() => router.push('/')}><ArrowBackIcon />Back to Lobby</IconButton>
-        <h2>{`Room: ${props.roomId}`}</h2>
-      </Grid>
+      <IconButton style={{
+        maxWidth:"150px", 
+        margin:"8px 0 0 0", 
+        fontSize:"15px"}} 
+        onClick={() => router.push('/')}><ArrowBackIcon />Back to Lobby</IconButton>
+      <h2>{`Room: ${props.roomId}`}</h2>
 
-      <Grid item xs={isPrivate ? 4 : 12} sm={isPrivate ? 4 : 12} md={isPrivate ? 4 : 12} lg={isPrivate ? 4 : 12}>
+      <div className='CustomizeView-form'>
         <FormControlLabel
             checked={isPrivate}
             label="Private"
@@ -76,19 +69,16 @@ function CustomizeView(props) {
             onChange={updateIsPrivate}
             className="CustomizeView-switch"
         />
-        </Grid>
 
-        {isPrivate &&
-        <Grid item xs={6} sm={6} md={6} lg={6}> 
-        <TextField label="Password" placeholder="Enter a room password" 
+        {isPrivate && <TextField label="Password" placeholder="Enter a room password" 
           variant="outlined" InputLabelProps={{shrink: true}} size='small'
           onChange={onPasswordChanged}
           value={password}
-        />
-        </Grid>
+          style={{
+            marginTop: "20px"
+          }} />
         }
-        
-        <Grid item xs={6} sm={6} md={12} lg={12}>
+
         <FormControl size='small' variant="outlined" style={{marginTop: "20px", maxWidth:'70px'}}>
           <InputLabel>Rounds</InputLabel>
           <Select
@@ -104,15 +94,13 @@ function CustomizeView(props) {
             <option value={5}>5</option>
           </Select>
         </FormControl>
-        </Grid>
 
-        <Grid item xs={6} sm={6} md={12} lg={12}>
         <FormControl size='small' variant="outlined" style={{marginTop: "20px", maxWidth:'120px'}}>
-          <InputLabel>Timer</InputLabel>
+          <InputLabel>Drawing Timer</InputLabel>
           <Select
             native
             value={timer}
-            label="Timer"
+            label="Drawing Timer"
             onChange={updateTimer}
           >
             <option value={30}>30s</option>
@@ -124,9 +112,7 @@ function CustomizeView(props) {
             <option value={180}>3m</option>
           </Select>
         </FormControl>
-        </Grid>
 
-        <Grid item xs={12} sm={12} >
         <FormControlLabel
             style={{marginTop:"20px"}}
             checked={isSpellcheck}
@@ -135,19 +121,16 @@ function CustomizeView(props) {
             onChange={updateIsSpellCheck}
             className="CustomizeView-switch"
         />
-        </Grid>
 
-      <Grid item xs={12} sm={12} md={12} lg={12}> 
+      </div>
+        
       <Button variant="contained" color="secondary" onClick={props.startGame}
-        fullWidth
         disableElevation style={{
           borderRadius: 0,
         }} disabled={!props.canStartGame}
         className={classes.disabledButton}>    
         {props.canStartGame ? "Start Game" : "Waiting for more players"}
       </Button>
-      </Grid>
-      </Grid> 
     </div>
   );
 }

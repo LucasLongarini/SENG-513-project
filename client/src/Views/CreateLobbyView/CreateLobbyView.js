@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundImage: `url(${Background})`,
-    backgroundAttachment: 'scroll',
     flexGrow: 1,
   },
   header: {
@@ -57,31 +56,9 @@ const useStyles = makeStyles((theme) => ({
     height: '80%',
     alignItems: 'center',
     [theme.breakpoints.down('sm')]: {
-      height: '40vh',
+      height: 'auto',
     }
   },
-  gameViewGridItem: {
-    display: 'flex',
-    width: 'auto',
-    height: '80%',
-    alignItems: 'center',
-    [theme.breakpoints.down('sm')]: {
-      height: '80vh',
-      margin: '0 !important',
-    }
-  },
-  gameParticipantsViewGridItem: {
-    display: 'flex',
-    width: 'auto',
-    height: '80%',
-    alignItems: 'center',
-    [theme.breakpoints.down('sm')]: {
-      height: '10vh',
-      display: 'flex',
-      flexDirection: 'column',
-      margin: '0 !important',
-    }
-  }
 }));
 
 toast.configure();

@@ -1,19 +1,18 @@
 .CustomizeView-container {
     background-color: white;
-    /* flex: 1;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; */
+    justify-content: space-between;
     width: 100%;
     height: auto;
-    box-shadow: 10px 10px 5px 0 rgba(0,0,0, .15);
-    padding: 8px;
 }
 
 .CustomizeView-container h2 {
     text-align: center;
     padding: 0 20px 20px 20px;
     font-weight: 500;
+    word-wrap: break-word;
 }
 
 .CustomizeView-switch {
@@ -23,7 +22,7 @@
 .CustomizeView-form {
     display: flex;
     flex-direction: column;
-    /* margin: 0 20px 40px 20px; */
+    margin: 0 20px 40px 20px;
     flex: 1;
 }
 
@@ -31,11 +30,5 @@
     .CustomizeView-container {
         height: 100%;
         margin-top: 0px;
-    }
-}
-
-@media screen and (max-width: 400px) {
-    .CustomizeView-container h2 {
-        font-size: 14px;
     }
 }

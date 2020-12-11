@@ -7,6 +7,7 @@ const useStyles = makeStyles((theme) => ({
     gameBoard: {
         position: 'relative',
         width: '100%',
+        height: '89.5%',
         margin: '20px 0 40px 0',
         flex: '1',
     },
