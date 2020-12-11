@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './CustomizeView.css';
-import { Button, TextField, Switch, FormControlLabel, FormControl, Select, InputLabel, IconButton } from '@material-ui/core';
+import { Button, TextField, Switch, FormControlLabel, FormControl, Select, InputLabel, IconButton, 
+  Grid, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import _ from "lodash";
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,7 +10,11 @@ import { useHistory } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   disabledButton: {
     color: "white",
-  }
+  },
+  gridContainer: {
+    width: '100%',
+    height: '100%',
+  },
 }));
 
 function CustomizeView(props) {
@@ -53,14 +58,17 @@ function CustomizeView(props) {
 
   return (
     <div className='CustomizeView-container'>
-      <IconButton style={{
-        maxWidth:"150px", 
-        margin:"8px 0 0 0", 
-        fontSize:"15px"}} 
-        onClick={() => router.push('/')}><ArrowBackIcon />Back to Lobby</IconButton>
-      <h2>{`Room: ${props.roomId}`}</h2>
+      <Grid className={classes.gridContainer} container >
+      <Grid item xs={12} sm={12} >
+        <IconButton style={{
+          maxWidth:"150px", 
+          margin:"8px 0 0 0", 
+          fontSize:"15px"}} 
+          onClick={() => router.push('/')}><ArrowBackIcon />Back to Lobby</IconButton>
+        <h2>{`Room: ${props.roomId}`}</h2>
+      </Grid>
 
-      <div className='CustomizeView-form'>
+      <Grid item xs={12} sm={12} >
         <FormControlLabel
             checked={isPrivate}
             label="Private"
@@ -77,7 +85,8 @@ function CustomizeView(props) {
             marginTop: "20px"
           }} />
         }
-
+        </Grid>
+        <Grid item xs={12} sm={12} >
         <FormControl size='small' variant="outlined" style={{marginTop: "20px", maxWidth:'70px'}}>
           <InputLabel>Rounds</InputLabel>
           <Select
@@ -93,7 +102,9 @@ function CustomizeView(props) {
             <option value={5}>5</option>
           </Select>
         </FormControl>
+        </Grid>
 
+        <Grid item xs={12} sm={12} >
         <FormControl size='small' variant="outlined" style={{marginTop: "20px", maxWidth:'120px'}}>
           <InputLabel>Drawing Timer</InputLabel>
           <Select
@@ -111,7 +122,9 @@ function CustomizeView(props) {
             <option value={180}>3m</option>
           </Select>
         </FormControl>
+        </Grid>
 
+        <Grid item xs={12} sm={12} >
         <FormControlLabel
             style={{marginTop:"20px"}}
             checked={isSpellcheck}
@@ -120,9 +133,9 @@ function CustomizeView(props) {
             onChange={updateIsSpellCheck}
             className="CustomizeView-switch"
         />
+        </Grid>
 
-      </div>
-        
+      <Grid item xs={12} sm={12} > 
       <Button variant="contained" color="secondary" onClick={props.startGame}
         disableElevation style={{
           borderRadius: 0,
@@ -130,6 +143,8 @@ function CustomizeView(props) {
         className={classes.disabledButton}>    
         {props.canStartGame ? "Start Game" : "Waiting for more players"}
       </Button>
+      </Grid>
+      </Grid> 
     </div>
   );
 }

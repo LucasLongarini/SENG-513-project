@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     height: '80%',
     alignItems: 'center',
     [theme.breakpoints.down('sm')]: {
-      height: 'auto',
+      height: '40vh',
     }
   },
 }));
