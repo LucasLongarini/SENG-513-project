@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     gameHeaderPaper: {
         width: 'auto',
         margin: 'auto',
-        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+        boxShadow: '10px 10px 5px 0 rgba(0,0,0, .15)',
         padding: '10px',
     },
     wordPicker: {
@@ -190,9 +190,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             })
         }
     }, []);
-
-    useEffect(() => {
-    }, [setDisplayPen, displayPen])
     
     function handleGameOver(topUsers) {
         setTopUsers(topUsers);
@@ -245,7 +242,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
 
     return (
         <div className={classes.root} >
-            {displayPen && <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>}
+            {isYourTurn && <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>}
             <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => displayPen && onPenMove(e)}>
                 <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
                     <div >

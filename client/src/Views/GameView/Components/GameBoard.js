@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     gameBoardCanvas: {
         backgroundColor: 'white',
         borderRadius: '5px',
-        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+        boxShadow: '10px 10px 5px 0 rgba(0,0,0, .15)',
         userSelect: 'none',
         '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
         '-webkitUserDrag': 'none',
@@ -25,18 +25,19 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '0 0 12px 12px',
         bottom: '0',
         height: '12px',
-        left: '-20px',
+        left: '-10px',
         position: 'absolute',
-        width: 'calc(100% + 40px)',
+        width: 'calc(100% + 20px)',
+        zIndex: '10',
+        boxShadow: '0px -5px 5px -1px rgba(0,0,0, .15)',
     },
 }));
 
 const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
     const canvasRef = useRef(null);
     const [activeColor, setActiveColor] = useState('#000000');
-    const [penSize, setPenSize] = useState(25);
+    const [penSize, setPenSize] = useState(5);
     const [penType, setPenType] = useState('pen');
-    const [isClearingBoard, setisClearingBoard,] = useState(false);
 
     let context;
     let isDrawing = false;
@@ -94,6 +95,10 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
                     setTimeout(() => readFromQueue(false), 500);
                     noDrawingEvents = false;
                 }
+            });
+
+            socket.on('switch turns', () => {
+                clearBoard(false);
             });
         }
 
@@ -301,8 +306,13 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
         }
     }
     
+    function handleDisplayPen(value) {
+        if (isYourTurn)
+            setDisplayPen(value);
+    };
+
     return (
-        <div className={classes.gameBoard} id="gameBoard" onMouseOut={() => setDisplayPen(false)} onMouseOver={() => setDisplayPen(true)}>
+        <div className={classes.gameBoard} id="gameBoard" onMouseOut={() => handleDisplayPen(false)} onMouseOver={() => handleDisplayPen(true)}>
             <canvas ref={canvasRef} className={classes.gameBoardCanvas}/>
             <div className={classes.gameBoardBottom}></div>
             {isYourTurn && 
