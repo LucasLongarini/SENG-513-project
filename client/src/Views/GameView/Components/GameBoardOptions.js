@@ -21,6 +21,8 @@ const useStyles = makeStyles((theme) => ({
     optionsContainer: {
         // pointerEvents: 'none',
         alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        width: '120px',
         bottom: '12px',
         display: 'flex',
         right: '2%',
@@ -82,8 +84,6 @@ const GameBoardOptions = (props) => {
         setPenType,
     } = props;
 
-    useEffect(() => {
-    }, [penSize, setPenSize, activeColor, setActiveColor]);
 
     const handleClick = (option) => (event) => {
         setMenuContent(option)

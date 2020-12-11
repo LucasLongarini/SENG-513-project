@@ -339,6 +339,7 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn, handlePenSize, handlePenC
                 clearBoard={clearBoard}
                 penType={penType} 
                 setPenType={setPenType}
+                setDisplayPen={setDisplayPen}
             />
             }
         </div>
