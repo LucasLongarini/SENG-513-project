@@ -1,8 +1,6 @@
 import { React, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import pencil from '../../../assets/images/pencil.svg';
-import timerIcon from '../../../assets/images/timerIcon.svg';
 import GameBoard from './GameBoard.js'
 import Chat from '../Components/ChatView/ChatContainer';
 import {
@@ -34,24 +32,21 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     gameBoardPen: {
-        backgroundImage: `url(${pencil})`,
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'contain',
         top: '0',
         left: '0',
         position: 'absolute',
-        width: 50,
-        height: 50,
+        borderRadius: 100,
         cursor: 'none',
+        border: '1px solid black',
         pointerEvents: 'none',
         zIndex:99999,
+        // visibility: 'hidden'
     },
     gridContainer: {
         width: '100%',
         height: '100%',
-      },
-      paper: {
+    },
+    paper: {
         padding: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
@@ -73,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
     gameHeaderPaper: {
         width: 'auto',
         margin: 'auto',
-        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+        boxShadow: '10px 10px 5px 0 rgba(0,0,0, .15)',
         padding: '10px',
     },
     wordPicker: {
@@ -109,7 +104,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     Howler.volume(0.8);
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
-    const router = useHistory();
     const [displayPen, setDisplayPen] = useState(false);
     const [words, setWords] = useState([]);
     const [chooseWords, setChooseWords] = useState([]);
@@ -133,7 +127,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     });
     const correctWordSound = new Howl({src: correctWordSrc});
     const turnStartSound = new Howl({src: turnStartSrc});
-
+    const [penSize, setPenSize] = useState(5); 
+    const [penColor, setPenColor] = useState("#000000"); 
 
     useEffect(() => {
         if (socket !== undefined) {
@@ -141,6 +136,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
 
             // your turn has started
             socket.on('start your turn', words => {
+                setWords([]);
                 setIsYourTurn(true);
                 setTurnEnded(false);
                 setTurnStarted(false);
@@ -151,6 +147,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             socket.on('switch turns', data => {
                 let id = authenticationService.getId();
                 if (id !== data.userId) {
+                    setWords([]);
                     setIsYourTurn(false);
                     setTurnEnded(false);
                     setTurnStarted(false);
@@ -160,7 +157,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             // a new players turn started
             socket.on('turn started', (data) => {
                 turnStartSound.play();
-                setWords([]);
                 setRound(`${data.round} of ${data.totalRounds}`);
                 setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);
@@ -193,9 +189,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             })
         }
     }, []);
-
-    useEffect(() => {
-    }, [setDisplayPen, displayPen])
     
     function handleGameOver(topUsers) {
         setTopUsers(topUsers);
@@ -211,8 +204,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     }
 
     const onPenMove = (e) => {
-        gameBoardPenRef.current.style.left = `${e.pageX}px`;
-        gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
+        gameBoardPenRef.current.style.left = `${e.pageX-(penSize/2)}px`;
+        gameBoardPenRef.current.style.top = `${e.pageY-(penSize/2)}px`;
     }
 
     const handleKeyDown = (word) => {
@@ -246,10 +239,19 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
         setCorrectWord(word.toUpperCase());
     }
 
+    function handlePenSize(size) {
+        setPenSize(size);        
+    }
+
+    function handlePenColor(color) {
+        setPenColor(color);
+    }
+
     return (
         <div className={classes.root} >
-            {displayPen && <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>}
-            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => displayPen && onPenMove(e)}>
+            {isYourTurn && displayPen && <div style={{background: penColor, width: penSize, height: penSize}} ref={gameBoardPenRef} className={classes.gameBoardPen}>
+                </div>}
+            <Grid className={classes.gridContainer} container spacing={3}>
                 <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
@@ -266,8 +268,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                             </Grid>
                         </Paper>
                     </div>
-                    <div className={classes.game} >
-                        <GameBoard socket={socket} setDisplayPen={setDisplayPen} isYourTurn={isYourTurn}/>
+                    <div  onMouseMove={(e) => displayPen && isYourTurn && onPenMove(e)} className={classes.game} >
+                        <GameBoard handlePenColor={handlePenColor} handlePenSize={handlePenSize} socket={socket} setDisplayPen={setDisplayPen} isYourTurn={isYourTurn}/>
                         {!turnStarted && 
                             <animated.div style={turnStartedAnimation}>
                                 <div className={classes.wordPicker}>
@@ -296,7 +298,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2} >
                     <Chat 
-                        isYourTurn={isYourTurn} 
+                        canType={!isYourTurn && turnStarted} 
                         words={words} 
                         onNewWord={handleSendWord} 
                         isSpellCheck={isSpellCheck} 

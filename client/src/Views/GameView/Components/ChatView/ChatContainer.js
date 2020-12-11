@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         width: '100%',
         height: '100%',
-        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+        boxShadow: '10px 10px 5px 0 rgba(0,0,0, .15)',
       },
       chatOutputContainer: {
         overflowY: 'auto',
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 function ChatContainer({
     onNewWord,
     words,
-    isYourTurn, 
+    canType, 
     isSpellCheck,
     onKeyDown,
     setMissSpelledWords,
@@ -125,7 +125,7 @@ function ChatContainer({
           }
         </div>
         <div className={classes.chatInputContainer}>
-          { !isYourTurn && 
+          { canType && 
               <TextField value={word} onKeyDown={handleKeyPressed} 
                 onChange={v => handleOnChange(v)}
                 size='small' variant='filled' 

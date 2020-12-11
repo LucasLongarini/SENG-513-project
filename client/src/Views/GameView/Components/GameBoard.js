@@ -13,11 +13,10 @@ const useStyles = makeStyles((theme) => ({
     gameBoardCanvas: {
         backgroundColor: 'white',
         borderRadius: '5px',
-        boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+        boxShadow: '10px 10px 5px 0 rgba(0,0,0, .15)',
         userSelect: 'none',
         '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
         '-webkitUserDrag': 'none',
-        cursor: 'none',
         width: '100%',
     },
     gameBoardBottom: {
@@ -25,18 +24,19 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '0 0 12px 12px',
         bottom: '0',
         height: '12px',
-        left: '-20px',
+        left: '-10px',
         position: 'absolute',
-        width: 'calc(100% + 40px)',
+        width: 'calc(100% + 20px)',
+        zIndex: '10',
+        boxShadow: '0px -5px 5px -1px rgba(0,0,0, .15)',
     },
 }));
 
-const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
+const GameBoard = ({socket, setDisplayPen, isYourTurn, handlePenSize, handlePenColor}) => {
     const canvasRef = useRef(null);
     const [activeColor, setActiveColor] = useState('#000000');
-    const [penSize, setPenSize] = useState(25);
+    const [penSize, setPenSize] = useState(5);
     const [penType, setPenType] = useState('pen');
-    const [isClearingBoard, setisClearingBoard,] = useState(false);
 
     let context;
     let isDrawing = false;
@@ -63,6 +63,14 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
     };
     
     const classes = useStyles();
+
+    useEffect(() => {
+        handlePenSize(penSize);
+    }, [penSize]);
+
+    useEffect(() => {
+        handlePenColor(activeColor);
+    }, [activeColor]);
 
     useEffect(() => {
         window.addEventListener('resize', onResize, false);
@@ -95,12 +103,27 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
                     noDrawingEvents = false;
                 }
             });
+
+            socket.on('switch turns', () => {
+                clearBoard(false);
+            });
         }
 
         return () => {
             window.removeEventListener('resize', onResize, false);
         }
     }, []);
+
+    useEffect(() =>{
+        if (canvasRef && canvasRef.current) {
+            if (isYourTurn) {
+                canvasRef.current.style.cursor = 'none';
+            }
+            else {
+                canvasRef.current.style.cursor = 'default';
+            }
+        }
+    }, [isYourTurn]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -252,6 +275,11 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
             return;
         }
         isDrawing = false;
+        let x = getXCord(e);
+        let y = getYCord(e);
+
+        if (isNaN(x) || isNaN(y))
+            return;
         drawLine(current.X, current.Y, getXCord(e), getYCord(e), activeColor, penSize, true);
     };
 
@@ -301,11 +329,13 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
         }
     }
     
+
     return (
         <div className={classes.gameBoard} id="gameBoard" onMouseOut={() => setDisplayPen(false)} onMouseOver={() => setDisplayPen(true)}>
             <canvas ref={canvasRef} className={classes.gameBoardCanvas}/>
             <div className={classes.gameBoardBottom}></div>
-            <GameBoardOptions 
+            {isYourTurn && 
+                <GameBoardOptions 
                 penSize={penSize}
                 setPenSize={setPenSize}
                 activeColor={activeColor}
@@ -314,7 +344,9 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
                 clearBoard={clearBoard}
                 penType={penType} 
                 setPenType={setPenType}
+                setDisplayPen={setDisplayPen}
             />
+            }
         </div>
     );
 }

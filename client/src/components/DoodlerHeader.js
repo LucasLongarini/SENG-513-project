@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
-    boxShadow: '10px 10px 0 0 rgba(0,0,0, .2)',
+    boxShadow: '10px 10px 5px 0 rgba(0,0,0, .15)',
   },
   logo: {
     width: '10%',
