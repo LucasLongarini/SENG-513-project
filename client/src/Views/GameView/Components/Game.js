@@ -32,24 +32,21 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
     gameBoardPen: {
-        backgroundImage: `url(${pencil})`,
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'contain',
         top: '0',
         left: '0',
         position: 'absolute',
-        width: 50,
-        height: 50,
+        borderRadius: 100,
         cursor: 'none',
+        border: '1px solid black',
         pointerEvents: 'none',
         zIndex:99999,
+        // visibility: 'hidden'
     },
     gridContainer: {
         width: '100%',
         height: '100%',
-      },
-      paper: {
+    },
+    paper: {
         padding: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
@@ -130,6 +127,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     });
     const correctWordSound = new Howl({src: correctWordSrc});
     const turnStartSound = new Howl({src: turnStartSrc});
+    const [penSize, setPenSize] = useState(5); 
+    const [penColor, setPenColor] = useState("#000000"); 
 
     useEffect(() => {
         if (socket !== undefined) {
@@ -205,8 +204,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     }
 
     const onPenMove = (e) => {
-        gameBoardPenRef.current.style.left = `${e.pageX}px`;
-        gameBoardPenRef.current.style.top = `${e.pageY-50}px`;
+        gameBoardPenRef.current.style.left = `${e.pageX-(penSize/2)}px`;
+        gameBoardPenRef.current.style.top = `${e.pageY-(penSize/2)}px`;
     }
 
     const handleKeyDown = (word) => {
@@ -240,10 +239,19 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
         setCorrectWord(word.toUpperCase());
     }
 
+    function handlePenSize(size) {
+        setPenSize(size);        
+    }
+
+    function handlePenColor(color) {
+        setPenColor(color);
+    }
+
     return (
         <div className={classes.root} >
-            {isYourTurn && <div ref={gameBoardPenRef} className={classes.gameBoardPen}></div>}
-            <Grid className={classes.gridContainer} container spacing={3} onMouseMove={(e) => displayPen && onPenMove(e)}>
+            {isYourTurn && displayPen && <div style={{background: penColor, width: penSize, height: penSize}} ref={gameBoardPenRef} className={classes.gameBoardPen}>
+                </div>}
+            <Grid className={classes.gridContainer} container spacing={3}>
                 <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
@@ -260,8 +268,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                             </Grid>
                         </Paper>
                     </div>
-                    <div className={classes.game} >
-                        <GameBoard socket={socket} setDisplayPen={setDisplayPen} isYourTurn={isYourTurn}/>
+                    <div  onMouseMove={(e) => displayPen && isYourTurn && onPenMove(e)} className={classes.game} >
+                        <GameBoard handlePenColor={handlePenColor} handlePenSize={handlePenSize} socket={socket} setDisplayPen={setDisplayPen} isYourTurn={isYourTurn}/>
                         {!turnStarted && 
                             <animated.div style={turnStartedAnimation}>
                                 <div className={classes.wordPicker}>

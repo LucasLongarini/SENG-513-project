@@ -17,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
         userSelect: 'none',
         '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
         '-webkitUserDrag': 'none',
-        cursor: 'none',
         width: '100%',
     },
     gameBoardBottom: {
@@ -33,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
+const GameBoard = ({socket, setDisplayPen, isYourTurn, handlePenSize, handlePenColor}) => {
     const canvasRef = useRef(null);
     const [activeColor, setActiveColor] = useState('#000000');
     const [penSize, setPenSize] = useState(5);
@@ -64,6 +63,14 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
     };
     
     const classes = useStyles();
+
+    useEffect(() => {
+        handlePenSize(penSize);
+    }, [penSize]);
+
+    useEffect(() => {
+        handlePenColor(activeColor);
+    }, [activeColor]);
 
     useEffect(() => {
         window.addEventListener('resize', onResize, false);
@@ -106,6 +113,17 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
             window.removeEventListener('resize', onResize, false);
         }
     }, []);
+
+    useEffect(() =>{
+        if (canvasRef && canvasRef.current) {
+            if (isYourTurn) {
+                canvasRef.current.style.cursor = 'none';
+            }
+            else {
+                canvasRef.current.style.cursor = 'default';
+            }
+        }
+    }, [isYourTurn]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -306,13 +324,9 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
         }
     }
     
-    function handleDisplayPen(value) {
-        if (isYourTurn)
-            setDisplayPen(value);
-    };
 
     return (
-        <div className={classes.gameBoard} id="gameBoard" onMouseOut={() => handleDisplayPen(false)} onMouseOver={() => handleDisplayPen(true)}>
+        <div className={classes.gameBoard} id="gameBoard" onMouseOut={() => setDisplayPen(false)} onMouseOver={() => setDisplayPen(true)}>
             <canvas ref={canvasRef} className={classes.gameBoardCanvas}/>
             <div className={classes.gameBoardBottom}></div>
             {isYourTurn && 
