@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 function ChatContainer({
     onNewWord,
     words,
-    isYourTurn, 
+    canType, 
     isSpellCheck,
     onKeyDown,
     setMissSpelledWords,
@@ -125,7 +125,7 @@ function ChatContainer({
           }
         </div>
         <div className={classes.chatInputContainer}>
-          { !isYourTurn && 
+          { canType && 
               <TextField value={word} onKeyDown={handleKeyPressed} 
                 onChange={v => handleOnChange(v)}
                 size='small' variant='filled' 

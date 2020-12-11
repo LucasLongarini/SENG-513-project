@@ -305,7 +305,8 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
         <div className={classes.gameBoard} id="gameBoard" onMouseOut={() => setDisplayPen(false)} onMouseOver={() => setDisplayPen(true)}>
             <canvas ref={canvasRef} className={classes.gameBoardCanvas}/>
             <div className={classes.gameBoardBottom}></div>
-            <GameBoardOptions 
+            {isYourTurn && 
+                <GameBoardOptions 
                 penSize={penSize}
                 setPenSize={setPenSize}
                 activeColor={activeColor}
@@ -315,6 +316,7 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn}) => {
                 penType={penType} 
                 setPenType={setPenType}
             />
+            }
         </div>
     );
 }

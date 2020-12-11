@@ -23,9 +23,6 @@
     "react-spring": "^8.0.27",
     "react-toastify": "^6.1.0",
     "socket.io-client": "^2.3.0",
-    "spellchecker": "^3.7.1",
-    "use-sound": "^2.0.1",
-    "uuid": "^8.3.1",
     "web-vitals": "^0.2.4"
   },
   "scripts": {

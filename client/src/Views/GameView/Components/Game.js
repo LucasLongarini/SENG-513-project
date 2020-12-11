@@ -1,8 +1,6 @@
 import { React, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import pencil from '../../../assets/images/pencil.svg';
-import timerIcon from '../../../assets/images/timerIcon.svg';
 import GameBoard from './GameBoard.js'
 import Chat from '../Components/ChatView/ChatContainer';
 import {
@@ -109,7 +107,6 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
     Howler.volume(0.8);
     const gameBoardPenRef = useRef(null);
     const classes = useStyles();
-    const router = useHistory();
     const [displayPen, setDisplayPen] = useState(false);
     const [words, setWords] = useState([]);
     const [chooseWords, setChooseWords] = useState([]);
@@ -296,7 +293,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                 </Grid>
                 <Grid className={classes.gridItem} item xs={2} >
                     <Chat 
-                        isYourTurn={isYourTurn} 
+                        canType={!isYourTurn && turnStarted} 
                         words={words} 
                         onNewWord={handleSendWord} 
                         isSpellCheck={isSpellCheck} 
