@@ -275,6 +275,11 @@ const GameBoard = ({socket, setDisplayPen, isYourTurn, handlePenSize, handlePenC
             return;
         }
         isDrawing = false;
+        let x = getXCord(e);
+        let y = getYCord(e);
+
+        if (isNaN(x) || isNaN(y))
+            return;
         drawLine(current.X, current.Y, getXCord(e), getYCord(e), activeColor, penSize, true);
     };
 
