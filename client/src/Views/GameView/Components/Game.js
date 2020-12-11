@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         height: '100%',
         position: 'relative',
+        [theme.breakpoints.down('sm')]: {
+            height: '40vh',
+          }
     },
     gameBoardPen: {
         top: '0',
@@ -45,6 +48,9 @@ const useStyles = makeStyles((theme) => ({
     gridContainer: {
         width: '100%',
         height: '100%',
+        [theme.breakpoints.down('sm')]: {
+            margin: 0,
+          }
     },
     paper: {
         padding: theme.spacing(2),
@@ -53,10 +59,15 @@ const useStyles = makeStyles((theme) => ({
     },
     gridItem: {
         height: '100%',
+        [theme.breakpoints.down('sm')]: {
+            height: '20vh',
+            display: 'flex',
+            flexDirection: 'column',
+          }
     },
     gridItemGame: {
         display: 'flex',
-        height: '100%',
+        // height: '100%',
         flexDirection: 'column',
     },
     gameHeader: {
@@ -252,17 +263,17 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             {isYourTurn && displayPen && <div style={{background: penColor, width: penSize, height: penSize}} ref={gameBoardPenRef} className={classes.gameBoardPen}>
                 </div>}
             <Grid className={classes.gridContainer} container spacing={3}>
-                <Grid className={classes.gridItemGame} item spacing={3} xs={10}>
+                <Grid className={classes.gridItemGame} item spacing={12} xs={12} md={10} lg={10}>
                     <div >
                         <Paper className={classes.gameHeaderPaper}>
                             <Grid container className={classes.gameHeader}>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>
+                                <Grid className={classes.headerItems} item xs={3} sm={3}>
                                     <h2 style={{fontWeight: 500}}>{`Round: ${round}`}</h2>
                                 </Grid>
-                                <Grid className={classes.headerItems} item xs={1} sm={6}>
+                                <Grid className={classes.headerItems} item xs={6} sm={6}>
                                     <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
                                 </Grid>
-                                <Grid className={classes.headerItems} item xs={1} sm={3}>
+                                <Grid className={classes.headerItems} item xs={3} sm={3}>
                                     <Timer time={timer}/>
                                 </Grid>
                             </Grid>
@@ -296,7 +307,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                         }
                     </div>
                 </Grid>
-                <Grid className={classes.gridItem} item xs={2} >
+                <Grid className={classes.gridItem} item xs={12} md={2} lg={2}>
                     <Chat 
                         canType={!isYourTurn && turnStarted} 
                         words={words} 

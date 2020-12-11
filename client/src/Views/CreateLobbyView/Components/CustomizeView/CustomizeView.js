@@ -68,7 +68,7 @@ function CustomizeView(props) {
         <h2>{`Room: ${props.roomId}`}</h2>
       </Grid>
 
-      <Grid item xs={12} sm={12} >
+      <Grid item xs={isPrivate ? 4 : 12} sm={isPrivate ? 4 : 12} md={isPrivate ? 4 : 12} lg={isPrivate ? 4 : 12}>
         <FormControlLabel
             checked={isPrivate}
             label="Private"
@@ -76,17 +76,19 @@ function CustomizeView(props) {
             onChange={updateIsPrivate}
             className="CustomizeView-switch"
         />
+        </Grid>
 
-        {isPrivate && <TextField label="Password" placeholder="Enter a room password" 
+        {isPrivate &&
+        <Grid item xs={6} sm={6} md={6} lg={6}> 
+        <TextField label="Password" placeholder="Enter a room password" 
           variant="outlined" InputLabelProps={{shrink: true}} size='small'
           onChange={onPasswordChanged}
           value={password}
-          style={{
-            marginTop: "20px"
-          }} />
-        }
+        />
         </Grid>
-        <Grid item xs={12} sm={12} >
+        }
+        
+        <Grid item xs={6} sm={6} md={12} lg={12}>
         <FormControl size='small' variant="outlined" style={{marginTop: "20px", maxWidth:'70px'}}>
           <InputLabel>Rounds</InputLabel>
           <Select
@@ -104,13 +106,13 @@ function CustomizeView(props) {
         </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={12} >
+        <Grid item xs={6} sm={6} md={12} lg={12}>
         <FormControl size='small' variant="outlined" style={{marginTop: "20px", maxWidth:'120px'}}>
-          <InputLabel>Drawing Timer</InputLabel>
+          <InputLabel>Timer</InputLabel>
           <Select
             native
             value={timer}
-            label="Drawing Timer"
+            label="Timer"
             onChange={updateTimer}
           >
             <option value={30}>30s</option>
@@ -135,8 +137,9 @@ function CustomizeView(props) {
         />
         </Grid>
 
-      <Grid item xs={12} sm={12} > 
+      <Grid item xs={12} sm={12} md={12} lg={12}> 
       <Button variant="contained" color="secondary" onClick={props.startGame}
+        fullWidth
         disableElevation style={{
           borderRadius: 0,
         }} disabled={!props.canStartGame}
