@@ -34,11 +34,11 @@ app.use('/room', roomRoutes);
 
 
 // Serving web page
-app.use(express.static(path.join(__dirname, "../client/build")));
+app.use(express.static(path.join(__dirname, "./client/build")));
 
 app.get('/*', (req, res) => {
     //res.sendStatus(200);
-    res.sendFile(path.join(__dirname, "../client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));
 })
 
 // sockets
