@@ -8,7 +8,9 @@ import Logo from '../assets/images/logo.svg';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-
+    // [theme.breakpoints.down('sm')]: {
+    //   height: '2vh',
+    // },
   },
   paper: {
     padding: theme.spacing(2),

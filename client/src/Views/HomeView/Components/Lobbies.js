@@ -43,10 +43,20 @@ const useStyles = makeStyles((theme) => ({
     tableContainer: {
         maxHeight: '70vh',
         overflowY: 'hidden',
+        [theme.breakpoints.down('sm')]: {
+          minHeight: '20vh',
+          minWidth: 150,
+          widht: 150,
+        },
     },
     scroll: {
         minHeight: '69vh',
         minWidth: 700,
+        [theme.breakpoints.down('sm')]: {
+          minHeight: '20vh',
+          minWidth: 150,
+          widht: 150,
+        },
     }
 }));
 

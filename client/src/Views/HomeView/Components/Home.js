@@ -41,12 +41,19 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     backgroundColor: theme.palette.grey[200],
   },
+  [theme.breakpoints.down('sm')]: {
+    height: '65vh',
+  },
   userProfile: {
     backgroundColor: theme.palette.grey[200],
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+  },
+  [theme.breakpoints.down('sm')]: {
+    height: '10vh',
   },
   logo: {
-    width: '10%',
+    height: '30vh',
   }
 }));
 
@@ -114,13 +121,13 @@ const Home = (props) => {
         <div className={classes.root}>
             <Grid className={classes.gridContainer} container spacing={3}>
                     <DoodleHeader />
-                <Grid item xs={12} sm={8}>
+                <Grid item xs={12} sm={8} >
                     <Paper className={classes.paper, classes.lobbies}>
                         <Typography variant="h5">{getLoobbiesTableHeader()}</Typography><br/>
                         <Lobbies refresh={getAllRooms} rooms={rooms}/>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={4} >
                     <Paper className={classes.paper, classes.userProfile}><UserProfile handleLogout={handleLogout} handleAutoJoin={handleAutoJoin} handleCreate={handleCreate}/></Paper>
                 </Grid>
             </Grid>

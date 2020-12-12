@@ -4,15 +4,15 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: auto;
+    width: 100%;
     height: auto;
-    box-shadow: 10px 10px 5px 0 rgba(0,0,0, .15);
 }
 
 .CustomizeView-container h2 {
     text-align: center;
     padding: 0 20px 20px 20px;
     font-weight: 500;
+    word-wrap: break-word;
 }
 
 .CustomizeView-switch {

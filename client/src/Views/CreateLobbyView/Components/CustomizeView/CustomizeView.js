@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './CustomizeView.css';
-import { Button, TextField, Switch, FormControlLabel, FormControl, Select, InputLabel, IconButton } from '@material-ui/core';
+import { Button, TextField, Switch, FormControlLabel, FormControl, Select, InputLabel, IconButton, 
+  Grid, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import _ from "lodash";
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,7 +10,7 @@ import { useHistory } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   disabledButton: {
     color: "white",
-  }
+  },
 }));
 
 function CustomizeView(props) {

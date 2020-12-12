@@ -11,6 +11,8 @@ body {
   /* font-family: 'Schoolbell' !important; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  background-image: url(./assets/images/Authpage_background.jpg);
 }
 
 .MuiTypography-h5 {

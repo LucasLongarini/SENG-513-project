@@ -21,6 +21,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Howl, Howler} from 'howler';
 import joinedSoundSrc from '../../assets/sounds/userJoined.mp3';
 import leftSoundSrc from '../../assets/sounds/userLeft.mp3';
+import { ImportantDevices } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -333,10 +334,10 @@ function CreateLobbyView() {
             <Grid item xs={12} className={classes.header}> 
               <DoodleHeader />
             </Grid>
-            <Grid item xs={2} className={classes.customizeViewGridItem}> 
+            <Grid item xs={12} md={2} lg={2}className={classes.gameParticipantsViewGridItem}> 
               <ParticipantView isGame={true} scores={scores} correctUserIds={correctUserIds} drawingUserId={drawingUserId} handleInviteLink={handleInviteLink} users={users} hostId={hostId}/>
             </Grid>
-            <Grid item xs={10} className={classes.customizeViewGridItem}>
+            <Grid item xs={12} md={10} lg={10}className={classes.gameViewGridItem}>
               {
                 <GameView
                   roomId={roomId}
