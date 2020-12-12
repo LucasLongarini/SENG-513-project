@@ -12,7 +12,7 @@ import GameView from './Views/GameView/GameView.js';
 import axios from 'axios';
 import packageJson from '../package.json';
 
-axios.defaults.baseURL = packageJson.proxy;
+// axios.defaults.baseURL = packageJson.proxy;
 function App() {
   const isDev = false; // remove for production
   return (
