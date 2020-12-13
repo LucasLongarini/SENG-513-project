@@ -172,6 +172,11 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                 setWordHint(data.wordHint.toUpperCase());
                 setTurnStarted(true);
                 setTurnEnded(false);
+
+                if (data.isWordHint === true) {
+                    let spacedWord = data.wordHint.toUpperCase().split('').join(' ');
+                    setWordHint(spacedWord);
+                }
             });
 
             // timer updates
@@ -191,7 +196,8 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
             });
 
             socket.on('word hint update', data => {
-                setWordHint(data.wordHint);
+                let spacedWord = data.wordHint.toUpperCase().split('').join(' ');
+                setWordHint(spacedWord);
             });
 
             socket.on('spelling checked', data => {
@@ -271,7 +277,7 @@ const Game = ({socket, handlePlayAgain, isSpellCheck}) => {
                                     <h2 style={{fontWeight: 500}}>{`Round: ${round}`}</h2>
                                 </Grid>
                                 <Grid className={classes.headerItems} item xs={6} sm={6}>
-                                    <h2 className={classes.wordHint}>{`${wordHint}`}</h2>
+                                    <h2 className={classes.wordHint}>{wordHint}</h2>
                                 </Grid>
                                 <Grid className={classes.headerItems} item xs={3} sm={3}>
                                     <Timer time={timer}/>

@@ -256,11 +256,13 @@ async function startTurn(io, socket, userId, roomId, data) {
             totalRounds: game.TotalRounds,
             round: game.CurrentRound,
             wordHint:  initialWordHint,
+            isWordHint: true,
         });
         io.to(socket.id).emit('turn started', {
             totalRounds: game.TotalRounds,
             round: game.CurrentRound,
             wordHint: data.word,
+            isWordHint: false,
         });
 
         // create a timer socket for the time

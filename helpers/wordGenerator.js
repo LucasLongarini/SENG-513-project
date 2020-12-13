@@ -37,8 +37,7 @@ module.exports.generateWords = async function() {
 }
 
 module.exports.convertWordToHint = function(word) {
-    let spacedWord = word.split('').join(' ');
-    return spacedWord.replace(/[^ ]/g, '_');
+    return word.replace(/[^ ]/g, '_');
 }
 
 module.exports.getScore = function(score, maxTime) {
@@ -57,20 +56,18 @@ function scaleValue(value, from, to) {
 }
 
 module.exports.revealWordHint = function(word, wordHint) {
-    let removedWhiteSpace = wordHint.split(' ').join('');
     let indexes = [];
-    for (let i = 0; i<removedWhiteSpace.length; i++) {
-        if (removedWhiteSpace[i] === '_')
+    for (let i = 0; i<wordHint.length; i++) {
+        if (wordHint[i] === '_')
             indexes.push(i);
     }
     
     // random number between 0 and indexes.length - 1
     let randomIndex = Math.floor(Math.random() * indexes.length);
     let characterIndex = indexes[randomIndex];
-    let newWord = removedWhiteSpace.replaceAt(characterIndex, word[characterIndex]);
+    let newWord = wordHint.replaceAt(characterIndex, word[characterIndex]);
 
-    // add back white space
-    return newWord.split('').join(' ');
+    return newWord;
 }
 
 String.prototype.replaceAt = function(index, replacement) {
